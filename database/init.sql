@@ -1,0 +1,111 @@
+CREATE DATABASE IF NOT EXISTS airbnb_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE airbnb_db;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS binh_luan;
+DROP TABLE IF EXISTS dat_phong;
+DROP TABLE IF EXISTS phong;
+DROP TABLE IF EXISTS vi_tri;
+DROP TABLE IF EXISTS nguoi_dung;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE nguoi_dung (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  pass_word VARCHAR(255) NOT NULL,
+  phone VARCHAR(20) NULL,
+  birth_day DATE NULL,
+  gender VARCHAR(10) NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'USER' COMMENT "'USER' or 'ADMIN'",
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_nguoi_dung_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE vi_tri (
+  id INT NOT NULL AUTO_INCREMENT,
+  ten_vi_tri VARCHAR(255) NOT NULL,
+  tinh_thanh VARCHAR(255) NOT NULL,
+  quoc_gia VARCHAR(255) NOT NULL,
+  hinh_anh VARCHAR(500) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE phong (
+  id INT NOT NULL AUTO_INCREMENT,
+  ten_phong VARCHAR(255) NOT NULL,
+  khach INT NOT NULL DEFAULT 1,
+  phong_ngu INT NOT NULL DEFAULT 1,
+  giuong INT NOT NULL DEFAULT 1,
+  phong_tam INT NOT NULL DEFAULT 1,
+  mo_ta TEXT NULL,
+  gia_tien DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  may_giat TINYINT(1) NOT NULL DEFAULT 0,
+  ban_la TINYINT(1) NOT NULL DEFAULT 0,
+  tivi TINYINT(1) NOT NULL DEFAULT 0,
+  dieu_hoa TINYINT(1) NOT NULL DEFAULT 0,
+  wifi TINYINT(1) NOT NULL DEFAULT 0,
+  bep TINYINT(1) NOT NULL DEFAULT 0,
+  do_xe TINYINT(1) NOT NULL DEFAULT 0,
+  ho_boi TINYINT(1) NOT NULL DEFAULT 0,
+  ban_ui TINYINT(1) NOT NULL DEFAULT 0,
+  hinh_anh VARCHAR(500) NULL,
+  ma_vi_tri INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_phong_ma_vi_tri (ma_vi_tri),
+  CONSTRAINT fk_phong_vi_tri
+    FOREIGN KEY (ma_vi_tri) REFERENCES vi_tri (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE dat_phong (
+  id INT NOT NULL AUTO_INCREMENT,
+  ma_phong INT NOT NULL,
+  ngay_den DATE NOT NULL,
+  ngay_di DATE NOT NULL,
+  so_luong_khach INT NOT NULL DEFAULT 1,
+  ma_nguoi_dat INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_dat_phong_ma_phong (ma_phong),
+  KEY idx_dat_phong_ma_nguoi_dat (ma_nguoi_dat),
+  CONSTRAINT fk_dat_phong_phong
+    FOREIGN KEY (ma_phong) REFERENCES phong (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_dat_phong_nguoi_dung
+    FOREIGN KEY (ma_nguoi_dat) REFERENCES nguoi_dung (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE binh_luan (
+  id INT NOT NULL AUTO_INCREMENT,
+  ma_phong INT NOT NULL,
+  ma_nguoi_binh_luan INT NOT NULL,
+  ngay_binh_luan DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  noi_dung TEXT NOT NULL,
+  sao_binh_luan INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_binh_luan_ma_phong (ma_phong),
+  KEY idx_binh_luan_ma_nguoi_binh_luan (ma_nguoi_binh_luan),
+  CONSTRAINT fk_binh_luan_phong
+    FOREIGN KEY (ma_phong) REFERENCES phong (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_binh_luan_nguoi_dung
+    FOREIGN KEY (ma_nguoi_binh_luan) REFERENCES nguoi_dung (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT chk_binh_luan_sao CHECK (sao_binh_luan BETWEEN 1 AND 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
