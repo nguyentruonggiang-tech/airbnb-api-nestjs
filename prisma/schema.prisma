@@ -1,0 +1,98 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/modules-system/prisma/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model binh_luan {
+  id                 Int        @id @default(autoincrement())
+  ma_phong           Int
+  ma_nguoi_binh_luan Int
+  ngay_binh_luan     DateTime   @default(now()) @db.DateTime(0)
+  noi_dung           String     @db.Text
+  sao_binh_luan      Int
+  created_at         DateTime   @default(now()) @db.DateTime(0)
+  updated_at         DateTime   @default(now()) @db.DateTime(0)
+  nguoi_dung         nguoi_dung @relation(fields: [ma_nguoi_binh_luan], references: [id], map: "fk_binh_luan_nguoi_dung")
+  phong              phong      @relation(fields: [ma_phong], references: [id], map: "fk_binh_luan_phong")
+
+  @@index([ma_nguoi_binh_luan], map: "idx_binh_luan_ma_nguoi_binh_luan")
+  @@index([ma_phong], map: "idx_binh_luan_ma_phong")
+}
+
+model dat_phong {
+  id             Int        @id @default(autoincrement())
+  ma_phong       Int
+  ngay_den       DateTime   @db.Date
+  ngay_di        DateTime   @db.Date
+  so_luong_khach Int        @default(1)
+  ma_nguoi_dat   Int
+  created_at     DateTime   @default(now()) @db.DateTime(0)
+  updated_at     DateTime   @default(now()) @db.DateTime(0)
+  nguoi_dung     nguoi_dung @relation(fields: [ma_nguoi_dat], references: [id], map: "fk_dat_phong_nguoi_dung")
+  phong          phong      @relation(fields: [ma_phong], references: [id], map: "fk_dat_phong_phong")
+
+  @@index([ma_nguoi_dat], map: "idx_dat_phong_ma_nguoi_dat")
+  @@index([ma_phong], map: "idx_dat_phong_ma_phong")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model nguoi_dung {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(255)
+  email      String      @unique(map: "uk_nguoi_dung_email") @db.VarChar(255)
+  pass_word  String      @db.VarChar(255)
+  phone      String?     @db.VarChar(20)
+  birth_day  DateTime?   @db.Date
+  gender     String?     @db.VarChar(10)
+  role       String      @default("USER") @db.VarChar(20)
+  created_at DateTime    @default(now()) @db.DateTime(0)
+  updated_at DateTime    @default(now()) @db.DateTime(0)
+  binh_luan  binh_luan[]
+  dat_phong  dat_phong[]
+}
+
+model phong {
+  id         Int         @id @default(autoincrement())
+  ten_phong  String      @db.VarChar(255)
+  khach      Int         @default(1)
+  phong_ngu  Int         @default(1)
+  giuong     Int         @default(1)
+  phong_tam  Int         @default(1)
+  mo_ta      String?     @db.Text
+  gia_tien   Decimal     @default(0.00) @db.Decimal(12, 2)
+  may_giat   Boolean     @default(false)
+  ban_la     Boolean     @default(false)
+  tivi       Boolean     @default(false)
+  dieu_hoa   Boolean     @default(false)
+  wifi       Boolean     @default(false)
+  bep        Boolean     @default(false)
+  do_xe      Boolean     @default(false)
+  ho_boi     Boolean     @default(false)
+  ban_ui     Boolean     @default(false)
+  hinh_anh   String?     @db.VarChar(500)
+  ma_vi_tri  Int
+  created_at DateTime    @default(now()) @db.DateTime(0)
+  updated_at DateTime    @default(now()) @db.DateTime(0)
+  binh_luan  binh_luan[]
+  dat_phong  dat_phong[]
+  vi_tri     vi_tri      @relation(fields: [ma_vi_tri], references: [id], map: "fk_phong_vi_tri")
+
+  @@index([ma_vi_tri], map: "idx_phong_ma_vi_tri")
+}
+
+model vi_tri {
+  id         Int      @id @default(autoincrement())
+  ten_vi_tri String   @db.VarChar(255)
+  tinh_thanh String   @db.VarChar(255)
+  quoc_gia   String   @db.VarChar(255)
+  hinh_anh   String?  @db.VarChar(500)
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  phong      phong[]
+}
