@@ -1,0 +1,30 @@
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { DATABASE_URL } from '../../common/constant/app.constant';
+import { PrismaClient } from './generated/prisma/client';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+    constructor() {
+        const url = new URL(DATABASE_URL as string);
+
+        const adapter = new PrismaMariaDb({
+            user: url.username,
+            password: url.password,
+            host: url.hostname,
+            port: Number(url.port),
+            database: url.pathname.substring(1),
+        });
+
+        super({ adapter });
+    }
+
+    async onModuleInit() {
+        try {
+            await this.$queryRaw`SELECT 1+1 AS result`;
+            console.log('✅ [PRISMA] Connection has been established successfully.');
+        } catch (error) {
+            console.error('❌ [PRISMA] Unable to connect to the database:', error);
+        }
+    }
+}
