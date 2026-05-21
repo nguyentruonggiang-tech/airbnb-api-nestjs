@@ -3,10 +3,13 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PORT } from './common/constant/app.constant';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser());
+  
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
