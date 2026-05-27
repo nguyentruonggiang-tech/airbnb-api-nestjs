@@ -7,6 +7,8 @@ export type BuildQueryPrismaOptions = {
     pageSizeDefault?: number;
     /** Các field tìm kiếm khi có keyword (contains) */
     keywordFields?: string[];
+    /** Ưu tiên keyword truyền từ ngoài (vd: path param) */
+    keyword?: string;
 };
 
 export type BuildQueryPrismaResult = {
@@ -25,6 +27,7 @@ export const buildQueryPrisma = (
         pageDefault = 1,
         pageSizeDefault = 10,
         keywordFields = [],
+        keyword: keywordOption,
     } = options;
 
     const { page, pageIndex, pageSize, keyword } = req.query;
@@ -44,10 +47,16 @@ export const buildQueryPrisma = (
         ...(withSoftDelete ? { isDeleted: false } : {}),
     };
 
-    if (typeof keyword === 'string' && keyword.trim() && keywordFields.length > 0) {
-        const keywordValue = keyword.trim();
+    let q = '';
+    if (typeof keywordOption === 'string') {
+        q = keywordOption.trim();
+    } else if (typeof keyword === 'string') {
+        q = keyword.trim();
+    }
+
+    if (q && keywordFields.length > 0) {
         where.OR = keywordFields.map((field) => ({
-            [field]: { contains: keywordValue },
+            [field]: { contains: q },
         }));
     }
 

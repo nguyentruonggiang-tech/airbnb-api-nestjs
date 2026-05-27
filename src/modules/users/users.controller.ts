@@ -15,6 +15,7 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
     ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse,
@@ -46,6 +47,26 @@ export class UsersController {
     @SuccessMessage('Lấy danh sách người dùng thành công')
     getUsers(@Req() req: Request) {
         return this.usersService.getUsers(req);
+    }
+
+    @Get('search/:keyword')
+    @Public()
+    @ApiOperation({ summary: 'Tìm kiếm người dùng theo từ khóa' })
+    @ApiParam({
+        name: 'keyword',
+        required: true,
+        type: String,
+        example: 'nguyen',
+    })
+    @ApiQuery({ name: 'pageIndex', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
+    @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
+    @ApiOkResponse({ description: 'Danh sách người dùng theo từ khóa (không có pass_word)' })
+    @SuccessMessage('Tìm kiếm người dùng thành công')
+    searchUsers(
+        @Param('keyword') keyword: string,
+        @Req() req: Request,
+    ) {
+        return this.usersService.searchUsers(keyword, req);
     }
 
     @Get(':id')
