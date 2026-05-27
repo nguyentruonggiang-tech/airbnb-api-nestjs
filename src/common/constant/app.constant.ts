@@ -9,3 +9,6 @@ export const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN ?? '1d';
 
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 export const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN ?? '7d';
+
+
+export const DEFAULT_SUCCESS_MESSAGE = 'Xử lý thành công';

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules-system/prisma/prisma.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ProtectGuard } from './common/guards/protect.guard';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { TokenModule } from './modules-system/token/token.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
@@ -29,6 +30,10 @@ import { UsersModule } from './modules/users/users.module';
         {
             provide: APP_GUARD,
             useClass: ProtectGuard,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ResponseInterceptor,
         },
     ],
 })
