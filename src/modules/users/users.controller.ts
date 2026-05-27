@@ -8,10 +8,15 @@ import {
     Post,
     Put,
     Req,
+    UploadedFile,
+    UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import {
     ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
@@ -21,7 +26,9 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
+import { User } from 'src/common/decorators/user.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
+import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -67,6 +74,32 @@ export class UsersController {
         @Req() req: Request,
     ) {
         return this.usersService.searchUsers(keyword, req);
+    }
+
+    @Post('upload-avatar')
+    @ApiBearerAuth()
+    @UseInterceptors(FileInterceptor('avatar'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                avatar: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    })
+    @ApiOperation({ summary: 'Upload avatar người dùng đang đăng nhập' })
+    @ApiOkResponse({ description: 'Upload avatar thành công (không có pass_word)' })
+    @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+    @SuccessMessage('Upload avatar thành công')
+    uploadAvatar(
+        @User() user: nguoi_dung,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.usersService.uploadAvatar(user.id, file);
     }
 
     @Get(':id')

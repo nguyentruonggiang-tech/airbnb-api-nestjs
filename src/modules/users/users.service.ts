@@ -9,6 +9,11 @@ import * as bcrypt from 'bcrypt';
 import { buildQueryPrisma } from 'src/common/helpers/build-query-prisma.helper';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
+import {
+    AVATAR_ALLOWED_MIME_TYPES,
+    AVATAR_MAX_SIZE_BYTES,
+} from 'src/common/constant/upload.constant';
+import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -17,7 +22,10 @@ export class UsersService {
     private readonly userOmit = { pass_word: true } as const;
     private readonly searchFields = ['name', 'email', 'phone'] as const;
 
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
+    ) { }
 
     async getUsers(req: Request) {
         const { index, page, pageSize, where } = buildQueryPrisma(req, {
@@ -137,6 +145,42 @@ export class UsersService {
             data,
             omit: this.userOmit,
         });
+    }
+
+    async uploadAvatar(userId: number, file?: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('Vui lòng chọn file ảnh');
+        }
+
+        const allowedTypes: string[] = [...AVATAR_ALLOWED_MIME_TYPES];
+        if (!allowedTypes.includes(file.mimetype)) {
+            throw new BadRequestException('File phải là ảnh (jpeg, png, gif, webp)');
+        }
+
+        if (file.size > AVATAR_MAX_SIZE_BYTES) {
+            throw new BadRequestException('Kích thước file không được vượt quá 5MB');
+        }
+
+        const userExist = await this.prisma.nguoi_dung.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExist) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        const { url, publicId } = await this.cloudinaryService.uploadImage(file, 'avatars');
+
+        const updatedUser = await this.prisma.nguoi_dung.update({
+            where: { id: userId },
+            data: { avatar: publicId },
+            omit: this.userOmit,
+        });
+
+        return {
+            ...updatedUser,
+            avatarUrl: url,
+        };
     }
 
     async deleteUser(id: number) {
