@@ -1,4 +1,260 @@
-import { Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import type { Request } from 'express';
+import * as bcrypt from 'bcrypt';
+import { buildQueryPrisma } from 'src/common/helpers/build-query-prisma.helper';
+import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
+import { PrismaService } from 'src/modules-system/prisma/prisma.service';
+import {
+    AVATAR_ALLOWED_MIME_TYPES,
+    AVATAR_MAX_SIZE_BYTES,
+} from 'src/common/constant/upload.constant';
+import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
+type UserWithoutPassword = Prisma.nguoi_dungGetPayload<{
+    omit: { pass_word: true };
+}>;
 
 @Injectable()
-export class UsersService {}
+export class UsersService {
+    private readonly userOmit = { pass_word: true } as const;
+    private readonly searchFields = ['name', 'email', 'phone'] as const;
+
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
+    ) { }
+
+    async getUsers(req: Request) {
+        const { index, page, pageSize, where } = buildQueryPrisma(req, {
+            keywordFields: [...this.searchFields],
+        });
+
+        const whereInput = where as Prisma.nguoi_dungWhereInput;
+
+        const [items, totalItem] = await Promise.all([
+            this.prisma.nguoi_dung.findMany({
+                where: whereInput,
+                skip: index,
+                take: pageSize,
+                omit: this.userOmit,
+            }),
+            this.prisma.nguoi_dung.count({
+                where: whereInput,
+            }),
+        ]);
+
+        return {
+            keyword: req.query.keyword,
+            page,
+            pageSize,
+            totalItem,
+            totalPage: Math.ceil(totalItem / pageSize),
+            items: items.map((user) => this.formatUser(user)),
+        };
+    }
+
+    async searchUsers(keyword: string, req: Request) {
+        const q = keyword.trim();
+
+        if (!q) {
+            throw new BadRequestException('Keyword không được để trống');
+        }
+
+        const { index, page, pageSize, where } = buildQueryPrisma(req, {
+            keywordFields: [...this.searchFields],
+            keyword: q,
+        });
+        const whereInput = where as Prisma.nguoi_dungWhereInput;
+
+        const [items, totalItem] = await Promise.all([
+            this.prisma.nguoi_dung.findMany({
+                where: whereInput,
+                skip: index,
+                take: pageSize,
+                omit: this.userOmit,
+            }),
+            this.prisma.nguoi_dung.count({
+                where: whereInput,
+            }),
+        ]);
+
+        return {
+            keyword: q,
+            page,
+            pageSize,
+            totalItem,
+            totalPage: Math.ceil(totalItem / pageSize),
+            items: items.map((user) => this.formatUser(user)),
+        };
+    }
+
+    async getUserById(id: number) {
+        const user = await this.prisma.nguoi_dung.findUnique({
+            where: { id },
+            omit: this.userOmit,
+        });
+
+        if (!user) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        return this.formatUser(user);
+    }
+
+    async createUser(dto: CreateUserDto) {
+        const { name, email, pass_word, phone, birth_day, gender, role } = dto;
+
+        await this.ensureEmailUnique(email);
+
+        const hashedPassword = await bcrypt.hash(pass_word, 10);
+
+        const user = await this.prisma.nguoi_dung.create({
+            data: {
+                name,
+                email,
+                pass_word: hashedPassword,
+                phone,
+                birth_day: birth_day ? new Date(birth_day) : null,
+                gender,
+                role: role ?? 'USER',
+            },
+            omit: this.userOmit,
+        });
+
+        return this.formatUser(user);
+    }
+
+    async updateUser(id: number, dto: UpdateUserDto) {
+        const existingUser = await this.prisma.nguoi_dung.findUnique({
+            where: { id },
+        });
+
+        if (!existingUser) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        if (dto.email && dto.email !== existingUser.email) {
+            await this.ensureEmailUnique(dto.email, id);
+        }
+
+        const data = await this.buildUpdateData(dto);
+
+        const user = await this.prisma.nguoi_dung.update({
+            where: { id },
+            data,
+            omit: this.userOmit,
+        });
+
+        return this.formatUser(user);
+    }
+
+    async uploadAvatar(userId: number, file?: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('Vui lòng chọn file ảnh');
+        }
+
+        const allowedTypes: string[] = [...AVATAR_ALLOWED_MIME_TYPES];
+        if (!allowedTypes.includes(file.mimetype)) {
+            throw new BadRequestException('File phải là ảnh (jpeg, png, gif, webp)');
+        }
+
+        if (file.size > AVATAR_MAX_SIZE_BYTES) {
+            throw new BadRequestException('Kích thước file không được vượt quá 5MB');
+        }
+
+        const userExist = await this.prisma.nguoi_dung.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExist) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        const { url, publicId } = await this.cloudinaryService.uploadImage(file, 'avatars');
+
+        const updatedUser = await this.prisma.nguoi_dung.update({
+            where: { id: userId },
+            data: { avatar: publicId },
+            omit: this.userOmit,
+        });
+
+        return this.formatUser(updatedUser);
+    }
+
+    async deleteUser(id: number) {
+        const existingUser = await this.prisma.nguoi_dung.findUnique({
+            where: { id },
+            omit: this.userOmit,
+        });
+
+        if (!existingUser) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        const [bookingCount, commentCount] = await Promise.all([
+            this.prisma.dat_phong.count({
+                where: { ma_nguoi_dat: id },
+            }),
+            this.prisma.binh_luan.count({
+                where: { ma_nguoi_binh_luan: id },
+            }),
+        ]);
+
+        if (bookingCount > 0 || commentCount > 0) {
+            throw new ConflictException(
+                'Không thể xóa người dùng vì đang có dữ liệu đặt phòng hoặc bình luận liên quan',
+            );
+        }
+
+        await this.prisma.nguoi_dung.delete({
+            where: { id },
+        });
+
+        return this.formatUser(existingUser);
+    }
+
+    private formatUser(user: UserWithoutPassword) {
+        const { avatar, ...rest } = user;
+
+        return {
+            ...rest,
+            avatar,
+            avatarUrl: this.cloudinaryService.getImageUrl(avatar),
+        };
+    }
+
+    private async buildUpdateData(
+        dto: UpdateUserDto,
+    ): Promise<Prisma.nguoi_dungUpdateInput> {
+        const { pass_word, birth_day, ...rest } = dto;
+        const data: Prisma.nguoi_dungUpdateInput = { ...rest };
+
+        if (pass_word) {
+            data.pass_word = await bcrypt.hash(pass_word, 10);
+        }
+
+        if (birth_day !== undefined) {
+            data.birth_day = birth_day ? new Date(birth_day) : null;
+        }
+
+        return data;
+    }
+
+    private async ensureEmailUnique(email: string, excludeId?: number) {
+        const emailExists = await this.prisma.nguoi_dung.findUnique({
+            where: { email },
+        });
+
+        if (emailExists && emailExists.id !== excludeId) {
+            throw new ConflictException('Email đã được sử dụng');
+        }
+    }
+
+}

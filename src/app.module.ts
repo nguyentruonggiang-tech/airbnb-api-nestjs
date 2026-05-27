@@ -5,6 +5,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ProtectGuard } from './common/guards/protect.guard';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { TokenModule } from './modules-system/token/token.module';
+import { CloudinaryModule } from './modules-system/cloudinary/cloudinary.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { CommentsModule } from './modules/comments/comments.module';
@@ -25,6 +26,7 @@ import { UsersModule } from './modules/users/users.module';
         BookingsModule,
         CommentsModule,
         TokenModule,
+        CloudinaryModule,
     ],
     providers: [
         {

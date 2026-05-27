@@ -50,6 +50,7 @@ model nguoi_dung {
   phone      String?     @db.VarChar(20)
   birth_day  DateTime?   @db.Date
   gender     String?     @db.VarChar(10)
+  avatar     String?     @db.VarChar(500)
   role       String      @default("USER") @db.VarChar(20)
   created_at DateTime    @default(now()) @db.DateTime(0)
   updated_at DateTime    @default(now()) @db.DateTime(0)

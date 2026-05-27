@@ -42,6 +42,7 @@ export type Nguoi_dungMinAggregateOutputType = {
   phone: string | null
   birth_day: Date | null
   gender: string | null
+  avatar: string | null
   role: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -55,6 +56,7 @@ export type Nguoi_dungMaxAggregateOutputType = {
   phone: string | null
   birth_day: Date | null
   gender: string | null
+  avatar: string | null
   role: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -68,6 +70,7 @@ export type Nguoi_dungCountAggregateOutputType = {
   phone: number
   birth_day: number
   gender: number
+  avatar: number
   role: number
   created_at: number
   updated_at: number
@@ -91,6 +94,7 @@ export type Nguoi_dungMinAggregateInputType = {
   phone?: true
   birth_day?: true
   gender?: true
+  avatar?: true
   role?: true
   created_at?: true
   updated_at?: true
@@ -104,6 +108,7 @@ export type Nguoi_dungMaxAggregateInputType = {
   phone?: true
   birth_day?: true
   gender?: true
+  avatar?: true
   role?: true
   created_at?: true
   updated_at?: true
@@ -117,6 +122,7 @@ export type Nguoi_dungCountAggregateInputType = {
   phone?: true
   birth_day?: true
   gender?: true
+  avatar?: true
   role?: true
   created_at?: true
   updated_at?: true
@@ -217,6 +223,7 @@ export type Nguoi_dungGroupByOutputType = {
   phone: string | null
   birth_day: Date | null
   gender: string | null
+  avatar: string | null
   role: string
   created_at: Date
   updated_at: Date
@@ -253,6 +260,7 @@ export type nguoi_dungWhereInput = {
   phone?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
   birth_day?: Prisma.DateTimeNullableFilter<"nguoi_dung"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
+  avatar?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
   role?: Prisma.StringFilter<"nguoi_dung"> | string
   created_at?: Prisma.DateTimeFilter<"nguoi_dung"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"nguoi_dung"> | Date | string
@@ -268,6 +276,7 @@ export type nguoi_dungOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   birth_day?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -287,6 +296,7 @@ export type nguoi_dungWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
   birth_day?: Prisma.DateTimeNullableFilter<"nguoi_dung"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
+  avatar?: Prisma.StringNullableFilter<"nguoi_dung"> | string | null
   role?: Prisma.StringFilter<"nguoi_dung"> | string
   created_at?: Prisma.DateTimeFilter<"nguoi_dung"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"nguoi_dung"> | Date | string
@@ -302,6 +312,7 @@ export type nguoi_dungOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   birth_day?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -323,6 +334,7 @@ export type nguoi_dungScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"nguoi_dung"> | string | null
   birth_day?: Prisma.DateTimeNullableWithAggregatesFilter<"nguoi_dung"> | Date | string | null
   gender?: Prisma.StringNullableWithAggregatesFilter<"nguoi_dung"> | string | null
+  avatar?: Prisma.StringNullableWithAggregatesFilter<"nguoi_dung"> | string | null
   role?: Prisma.StringWithAggregatesFilter<"nguoi_dung"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"nguoi_dung"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"nguoi_dung"> | Date | string
@@ -335,6 +347,7 @@ export type nguoi_dungCreateInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -350,6 +363,7 @@ export type nguoi_dungUncheckedCreateInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -364,6 +378,7 @@ export type nguoi_dungUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -379,6 +394,7 @@ export type nguoi_dungUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,6 +410,7 @@ export type nguoi_dungCreateManyInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -406,6 +423,7 @@ export type nguoi_dungUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -419,6 +437,7 @@ export type nguoi_dungUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -443,6 +462,7 @@ export type nguoi_dungCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   birth_day?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
   role?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -460,6 +480,7 @@ export type nguoi_dungMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   birth_day?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
   role?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -473,6 +494,7 @@ export type nguoi_dungMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   birth_day?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  avatar?: Prisma.SortOrder
   role?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -525,6 +547,7 @@ export type nguoi_dungCreateWithoutBinh_luanInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -539,6 +562,7 @@ export type nguoi_dungUncheckedCreateWithoutBinh_luanInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -568,6 +592,7 @@ export type nguoi_dungUpdateWithoutBinh_luanInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -582,6 +607,7 @@ export type nguoi_dungUncheckedUpdateWithoutBinh_luanInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -595,6 +621,7 @@ export type nguoi_dungCreateWithoutDat_phongInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -609,6 +636,7 @@ export type nguoi_dungUncheckedCreateWithoutDat_phongInput = {
   phone?: string | null
   birth_day?: Date | string | null
   gender?: string | null
+  avatar?: string | null
   role?: string
   created_at?: Date | string
   updated_at?: Date | string
@@ -638,6 +666,7 @@ export type nguoi_dungUpdateWithoutDat_phongInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +681,7 @@ export type nguoi_dungUncheckedUpdateWithoutDat_phongInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birth_day?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -706,6 +736,7 @@ export type nguoi_dungSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   phone?: boolean
   birth_day?: boolean
   gender?: boolean
+  avatar?: boolean
   role?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -724,12 +755,13 @@ export type nguoi_dungSelectScalar = {
   phone?: boolean
   birth_day?: boolean
   gender?: boolean
+  avatar?: boolean
   role?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type nguoi_dungOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "pass_word" | "phone" | "birth_day" | "gender" | "role" | "created_at" | "updated_at", ExtArgs["result"]["nguoi_dung"]>
+export type nguoi_dungOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "pass_word" | "phone" | "birth_day" | "gender" | "avatar" | "role" | "created_at" | "updated_at", ExtArgs["result"]["nguoi_dung"]>
 export type nguoi_dungInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   binh_luan?: boolean | Prisma.nguoi_dung$binh_luanArgs<ExtArgs>
   dat_phong?: boolean | Prisma.nguoi_dung$dat_phongArgs<ExtArgs>
@@ -750,6 +782,7 @@ export type $nguoi_dungPayload<ExtArgs extends runtime.Types.Extensions.Internal
     phone: string | null
     birth_day: Date | null
     gender: string | null
+    avatar: string | null
     role: string
     created_at: Date
     updated_at: Date
@@ -1131,6 +1164,7 @@ export interface nguoi_dungFieldRefs {
   readonly phone: Prisma.FieldRef<"nguoi_dung", 'String'>
   readonly birth_day: Prisma.FieldRef<"nguoi_dung", 'DateTime'>
   readonly gender: Prisma.FieldRef<"nguoi_dung", 'String'>
+  readonly avatar: Prisma.FieldRef<"nguoi_dung", 'String'>
   readonly role: Prisma.FieldRef<"nguoi_dung", 'String'>
   readonly created_at: Prisma.FieldRef<"nguoi_dung", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"nguoi_dung", 'DateTime'>
