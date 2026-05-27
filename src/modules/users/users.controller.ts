@@ -9,6 +9,7 @@ import {
     Put,
     Req,
     UploadedFile,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -17,6 +18,7 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiConsumes,
+    ApiForbiddenResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
@@ -26,8 +28,10 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -121,6 +125,11 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Chưa đăng nhập hoặc token không hợp lệ',
     })
+    @ApiForbiddenResponse({
+        description: 'Không có quyền, chỉ ADMIN mới được tạo người dùng',
+    })
+    @UseGuards(RolesGuard)
+    @Roles('ADMIN')
     @SuccessMessage('Tạo người dùng thành công')
     createUser(@Body() createUserDto: CreateUserDto) {
         return this.usersService.createUser(createUserDto);
@@ -136,6 +145,11 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Chưa đăng nhập hoặc token không hợp lệ',
     })
+    @ApiForbiddenResponse({
+        description: 'Không có quyền, chỉ ADMIN mới được cập nhật người dùng',
+    })
+    @UseGuards(RolesGuard)
+    @Roles('ADMIN')
     @SuccessMessage('Cập nhật người dùng thành công')
     updateUser(
         @Param('id', ParseIntPipe) id: number,
@@ -152,6 +166,11 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Chưa đăng nhập hoặc token không hợp lệ',
     })
+    @ApiForbiddenResponse({
+        description: 'Không có quyền, chỉ ADMIN mới được xóa người dùng',
+    })
+    @UseGuards(RolesGuard)
+    @Roles('ADMIN')
     @SuccessMessage('Xóa người dùng thành công')
     deleteUser(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.deleteUser(id);
