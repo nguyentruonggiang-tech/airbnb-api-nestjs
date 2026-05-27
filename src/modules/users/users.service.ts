@@ -17,6 +17,10 @@ import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.serv
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+type UserWithoutPassword = Prisma.nguoi_dungGetPayload<{
+    omit: { pass_word: true };
+}>;
+
 @Injectable()
 export class UsersService {
     private readonly userOmit = { pass_word: true } as const;
@@ -52,7 +56,7 @@ export class UsersService {
             pageSize,
             totalItem,
             totalPage: Math.ceil(totalItem / pageSize),
-            items,
+            items: items.map((user) => this.formatUser(user)),
         };
     }
 
@@ -87,7 +91,7 @@ export class UsersService {
             pageSize,
             totalItem,
             totalPage: Math.ceil(totalItem / pageSize),
-            items,
+            items: items.map((user) => this.formatUser(user)),
         };
     }
 
@@ -101,7 +105,7 @@ export class UsersService {
             throw new NotFoundException('Không tìm thấy người dùng');
         }
 
-        return user;
+        return this.formatUser(user);
     }
 
     async createUser(dto: CreateUserDto) {
@@ -111,7 +115,7 @@ export class UsersService {
 
         const hashedPassword = await bcrypt.hash(pass_word, 10);
 
-        return this.prisma.nguoi_dung.create({
+        const user = await this.prisma.nguoi_dung.create({
             data: {
                 name,
                 email,
@@ -123,6 +127,8 @@ export class UsersService {
             },
             omit: this.userOmit,
         });
+
+        return this.formatUser(user);
     }
 
     async updateUser(id: number, dto: UpdateUserDto) {
@@ -140,11 +146,13 @@ export class UsersService {
 
         const data = await this.buildUpdateData(dto);
 
-        return this.prisma.nguoi_dung.update({
+        const user = await this.prisma.nguoi_dung.update({
             where: { id },
             data,
             omit: this.userOmit,
         });
+
+        return this.formatUser(user);
     }
 
     async uploadAvatar(userId: number, file?: Express.Multer.File) {
@@ -177,10 +185,7 @@ export class UsersService {
             omit: this.userOmit,
         });
 
-        return {
-            ...updatedUser,
-            avatarUrl: url,
-        };
+        return this.formatUser(updatedUser);
     }
 
     async deleteUser(id: number) {
@@ -212,7 +217,17 @@ export class UsersService {
             where: { id },
         });
 
-        return existingUser;
+        return this.formatUser(existingUser);
+    }
+
+    private formatUser(user: UserWithoutPassword) {
+        const { avatar, ...rest } = user;
+
+        return {
+            ...rest,
+            avatar,
+            avatarUrl: this.cloudinaryService.getImageUrl(avatar),
+        };
     }
 
     private async buildUpdateData(

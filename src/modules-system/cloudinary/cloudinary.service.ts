@@ -12,6 +12,27 @@ export type UploadImageResult = {
 
 @Injectable()
 export class CloudinaryService {
+    getImageUrl(publicId: string | null): string | null {
+        if (!publicId) {
+            return null;
+        }
+
+        if (publicId.startsWith('http')) {
+            return publicId;
+        }
+
+        if (!CLOUDINARY_URL) {
+            return null;
+        }
+
+        cloudinary.config({
+            cloudinary_url: CLOUDINARY_URL,
+            secure: true,
+        });
+
+        return cloudinary.url(publicId, { secure: true });
+    }
+
     uploadImage(file: Express.Multer.File, folder?: string): Promise<UploadImageResult> {
         if (!CLOUDINARY_URL) {
             throw new BadRequestException(
