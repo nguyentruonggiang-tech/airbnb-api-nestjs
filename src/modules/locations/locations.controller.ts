@@ -8,13 +8,19 @@ import {
   Post,
   Put,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -66,6 +72,34 @@ export class LocationsController {
   @SuccessMessage('Tạo vị trí thành công')
   createLocation(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.createLocation(createLocationDto);
+  }
+
+  @Post('upload-hinh-vitri/:id')
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('hinhAnh'))
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID vị trí' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        hinhAnh: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: 'Upload hình ảnh vị trí' })
+  @ApiOkResponse({ description: 'Upload hình vị trí thành công' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
+  @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @SuccessMessage('Upload hình vị trí thành công')
+  uploadLocationImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.locationsService.uploadLocationImage(id, file);
   }
 
   @Put(':id')

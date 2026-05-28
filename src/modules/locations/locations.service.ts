@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Request } from 'express';
+import {
+    AVATAR_ALLOWED_MIME_TYPES,
+    AVATAR_MAX_SIZE_BYTES,
+} from 'src/common/constant/upload.constant';
 import { buildQueryPrisma } from 'src/common/helpers/build-query-prisma.helper';
+import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 import { CreateLocationDto } from './dto/create-location.dto';
@@ -10,7 +15,10 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 export class LocationsService {
     private readonly searchFields = ['ten_vi_tri', 'tinh_thanh', 'quoc_gia'] as const;
 
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
+    ) { }
 
     async getLocations(req: Request) {
         const { index, page, pageSize, where } = buildQueryPrisma(req, {
@@ -82,5 +90,29 @@ export class LocationsService {
         });
 
         return location;
+    }
+
+    async uploadLocationImage(id: number, file?: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('Vui lòng chọn file ảnh');
+        }
+
+        const allowedTypes: string[] = [...AVATAR_ALLOWED_MIME_TYPES];
+        if (!allowedTypes.includes(file.mimetype)) {
+            throw new BadRequestException('File phải là ảnh (jpeg, png, gif, webp)');
+        }
+
+        if (file.size > AVATAR_MAX_SIZE_BYTES) {
+            throw new BadRequestException('Kích thước file không được vượt quá 5MB');
+        }
+
+        await this.getLocationById(id);
+
+        const { publicId } = await this.cloudinaryService.uploadImage(file, 'locations');
+
+        return this.prisma.vi_tri.update({
+            where: { id },
+            data: { hinh_anh: publicId },
+        });
     }
 }
