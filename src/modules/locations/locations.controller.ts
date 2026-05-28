@@ -7,12 +7,15 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -29,11 +32,20 @@ export class LocationsController {
 
   @Get()
   @Public()
-  @ApiOperation({ summary: 'Lấy danh sách vị trí' })
+  @ApiOperation({ summary: 'Lấy danh sách vị trí (phân trang, tìm kiếm)' })
+  @ApiQuery({ name: 'pageIndex', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
+  @ApiQuery({
+    name: 'keyword',
+    required: false,
+    type: String,
+    example: 'Hồ Chí Minh',
+    description: 'Tìm theo ten_vi_tri, tinh_thanh hoặc quoc_gia',
+  })
   @ApiOkResponse({ description: 'Lấy danh sách vị trí thành công' })
   @SuccessMessage('Lấy danh sách vị trí thành công')
-  getLocations() {
-    return this.locationsService.getLocations();
+  getLocations(@Req() req: Request) {
+    return this.locationsService.getLocations(req);
   }
 
   @Get(':id')
