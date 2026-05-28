@@ -14,6 +14,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             host: url.hostname,
             port: Number(url.port),
             database: url.pathname.substring(1),
+            allowPublicKeyRetrieval: true
         });
 
         super({ adapter });

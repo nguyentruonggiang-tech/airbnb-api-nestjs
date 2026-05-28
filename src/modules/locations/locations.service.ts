@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import {
     AVATAR_ALLOWED_MIME_TYPES,
@@ -89,9 +94,19 @@ export class LocationsService {
     async deleteLocation(id: number) {
         const location = await this.getLocationById(id);
 
-        await this.prisma.vi_tri.delete({
-            where: { id },
-        });
+        try {
+            await this.prisma.vi_tri.delete({
+                where: { id },
+            });
+        } catch (error) {
+            if (this.isForeignKeyConstraintError(error)) {
+                throw new ConflictException(
+                    'Không thể xóa vị trí vì đang có phòng liên quan',
+                );
+            }
+
+            throw error;
+        }
 
         return this.formatLocation(location);
     }
@@ -127,5 +142,14 @@ export class LocationsService {
             ...location,
             hinh_anh: this.cloudinaryService.getImageUrl(location.hinh_anh),
         };
+    }
+
+    private isForeignKeyConstraintError(error: unknown): boolean {
+        if (!error || typeof error !== 'object') {
+            return false;
+        }
+
+        const prismaError = error as { code?: string };
+        return prismaError.code === 'P2003';
     }
 }
