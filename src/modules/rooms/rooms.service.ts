@@ -61,7 +61,7 @@ export class RoomsService {
       pageSize,
       totalItem,
       totalPage: Math.ceil(totalItem / pageSize),
-      items,
+      items: items.map((item) => this.formatRoom(item)),
     };
   }
 
@@ -74,13 +74,13 @@ export class RoomsService {
       throw new NotFoundException('Không tìm thấy phòng');
     }
 
-    return room;
+    return this.formatRoom(room);
   }
 
   async createRoom(dto: CreateRoomDto) {
     await this.ensureLocationExists(dto.ma_vi_tri);
 
-    return this.prisma.phong.create({
+    const createdRoom = await this.prisma.phong.create({
       data: {
         ten_phong: dto.ten_phong,
         khach: dto.khach,
@@ -102,6 +102,8 @@ export class RoomsService {
         ma_vi_tri: dto.ma_vi_tri,
       },
     });
+
+    return this.formatRoom(createdRoom);
   }
 
   async updateRoom(id: number, dto: UpdateRoomDto) {
@@ -111,12 +113,14 @@ export class RoomsService {
       await this.ensureLocationExists(dto.ma_vi_tri);
     }
 
-    return this.prisma.phong.update({
+    const updatedRoom = await this.prisma.phong.update({
       where: { id },
       data: {
         ...dto,
       },
     });
+
+    return this.formatRoom(updatedRoom);
   }
 
   async deleteRoom(id: number) {
@@ -136,7 +140,7 @@ export class RoomsService {
       throw error;
     }
 
-    return room;
+    return this.formatRoom(room);
   }
 
   async uploadRoomImage(id: number, file?: Express.Multer.File) {
@@ -157,10 +161,12 @@ export class RoomsService {
 
     const { publicId } = await this.cloudinaryService.uploadImage(file, 'rooms');
 
-    return this.prisma.phong.update({
+    const updatedRoom = await this.prisma.phong.update({
       where: { id },
       data: { hinh_anh: publicId },
     });
+
+    return this.formatRoom(updatedRoom);
   }
 
   private async ensureLocationExists(locationId: number) {
@@ -181,5 +187,12 @@ export class RoomsService {
 
     const prismaError = error as { code?: string };
     return prismaError.code === 'P2003';
+  }
+
+  private formatRoom<T extends { hinh_anh: string | null }>(room: T): T {
+    return {
+      ...room,
+      hinh_anh: this.cloudinaryService.getImageUrl(room.hinh_anh),
+    };
   }
 }
