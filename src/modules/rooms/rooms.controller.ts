@@ -8,9 +8,14 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -68,6 +73,34 @@ export class RoomsController {
   @SuccessMessage('Tạo phòng thành công')
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(createRoomDto);
+  }
+
+  @Post('upload-hinh-phong/:id')
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('hinhAnh'))
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        hinhAnh: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: 'Upload hình ảnh phòng' })
+  @ApiOkResponse({ description: 'Upload hình phòng thành công' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
+  @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @SuccessMessage('Upload hình phòng thành công')
+  uploadRoomImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.roomsService.uploadRoomImage(id, file);
   }
 
   @Put(':id')
