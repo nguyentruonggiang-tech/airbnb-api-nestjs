@@ -35,6 +35,22 @@ export class BookingsController {
     return this.bookingsService.getBookings();
   }
 
+  @Get('lay-theo-nguoi-dung/:maNguoiDung')
+  @Public()
+  @ApiOperation({ summary: 'Lấy danh sách đặt phòng theo người dùng' })
+  @ApiParam({
+    name: 'maNguoiDung',
+    type: Number,
+    example: 1,
+    description: 'Mã người dùng',
+  })
+  @ApiOkResponse({ description: 'Lấy danh sách đặt phòng theo người dùng thành công' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy người dùng' })
+  @SuccessMessage('Lấy danh sách đặt phòng theo người dùng thành công')
+  getBookingsByUser(@Param('maNguoiDung', ParseIntPipe) maNguoiDung: number) {
+    return this.bookingsService.getBookingsByUser(maNguoiDung);
+  }
+
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Lấy thông tin đặt phòng theo id' })

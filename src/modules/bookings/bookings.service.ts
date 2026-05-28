@@ -15,6 +15,17 @@ export class BookingsService {
     return items.map((item) => this.formatBooking(item));
   }
 
+  async getBookingsByUser(maNguoiDung: number) {
+    await this.checkUserExists(maNguoiDung);
+
+    const items = await this.prisma.dat_phong.findMany({
+      where: { ma_nguoi_dat: maNguoiDung },
+      orderBy: { id: 'desc' },
+    });
+
+    return items.map((item) => this.formatBooking(item));
+  }
+
   async getBookingById(id: number) {
     const booking = await this.prisma.dat_phong.findUnique({
       where: { id },
@@ -70,6 +81,17 @@ export class BookingsService {
     });
 
     return this.formatBooking(booking);
+  }
+
+  private async checkUserExists(maNguoiDung: number) {
+    const user = await this.prisma.nguoi_dung.findUnique({
+      where: { id: maNguoiDung },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy người dùng');
+    }
   }
 
   private formatBooking<T extends { ngay_den: Date; ngay_di: Date }>(booking: T) {
