@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -25,7 +27,9 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { GetRoomsQueryDto } from './dto/get-rooms-query.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -70,6 +74,9 @@ export class RoomsController {
   @ApiOkResponse({ description: 'Tạo phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được tạo phòng' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Tạo phòng thành công')
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(createRoomDto);
@@ -95,6 +102,9 @@ export class RoomsController {
   @ApiOkResponse({ description: 'Upload hình phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được upload hình phòng' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Upload hình phòng thành công')
   uploadRoomImage(
     @Param('id', ParseIntPipe) id: number,
@@ -110,6 +120,9 @@ export class RoomsController {
   @ApiOkResponse({ description: 'Cập nhật phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy phòng hoặc vị trí' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được cập nhật phòng' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Cập nhật phòng thành công')
   updateRoom(
     @Param('id', ParseIntPipe) id: number,
@@ -125,6 +138,9 @@ export class RoomsController {
   @ApiOkResponse({ description: 'Xóa phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được xóa phòng' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Xóa phòng thành công')
   deleteRoom(@Param('id', ParseIntPipe) id: number) {
     return this.roomsService.deleteRoom(id);
