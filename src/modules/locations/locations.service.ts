@@ -44,7 +44,7 @@ export class LocationsService {
             pageSize,
             totalItem,
             totalPage: Math.ceil(totalItem / pageSize),
-            items,
+            items: items.map((item) => this.formatLocation(item)),
         };
     }
 
@@ -57,11 +57,11 @@ export class LocationsService {
             throw new NotFoundException('Không tìm thấy vị trí');
         }
 
-        return location;
+        return this.formatLocation(location);
     }
 
     async createLocation(dto: CreateLocationDto) {
-        return this.prisma.vi_tri.create({
+        const createdLocation = await this.prisma.vi_tri.create({
             data: {
                 ten_vi_tri: dto.ten_vi_tri,
                 tinh_thanh: dto.tinh_thanh,
@@ -69,17 +69,21 @@ export class LocationsService {
                 hinh_anh: dto.hinh_anh ?? null,
             },
         });
+
+        return this.formatLocation(createdLocation);
     }
 
     async updateLocation(id: number, dto: UpdateLocationDto) {
         await this.getLocationById(id);
 
-        return this.prisma.vi_tri.update({
+        const updatedLocation = await this.prisma.vi_tri.update({
             where: { id },
             data: {
                 ...dto,
             },
         });
+
+        return this.formatLocation(updatedLocation);
     }
 
     async deleteLocation(id: number) {
@@ -89,7 +93,7 @@ export class LocationsService {
             where: { id },
         });
 
-        return location;
+        return this.formatLocation(location);
     }
 
     async uploadLocationImage(id: number, file?: Express.Multer.File) {
@@ -110,9 +114,18 @@ export class LocationsService {
 
         const { publicId } = await this.cloudinaryService.uploadImage(file, 'locations');
 
-        return this.prisma.vi_tri.update({
+        const updatedLocation = await this.prisma.vi_tri.update({
             where: { id },
             data: { hinh_anh: publicId },
         });
+
+        return this.formatLocation(updatedLocation);
+    }
+
+    private formatLocation<T extends { hinh_anh: string | null }>(location: T): T {
+        return {
+            ...location,
+            hinh_anh: this.cloudinaryService.getImageUrl(location.hinh_anh),
+        };
     }
 }
