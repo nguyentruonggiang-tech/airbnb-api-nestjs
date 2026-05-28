@@ -17,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,7 +27,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UseGuards } from '@nestjs/common';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { LocationsService } from './locations.service';
@@ -69,6 +73,9 @@ export class LocationsController {
   @ApiOperation({ summary: 'Tạo vị trí mới' })
   @ApiOkResponse({ description: 'Tạo vị trí thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được tạo vị trí' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Tạo vị trí thành công')
   createLocation(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.createLocation(createLocationDto);
@@ -94,6 +101,9 @@ export class LocationsController {
   @ApiOkResponse({ description: 'Upload hình vị trí thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được upload hình vị trí' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Upload hình vị trí thành công')
   uploadLocationImage(
     @Param('id', ParseIntPipe) id: number,
@@ -108,6 +118,9 @@ export class LocationsController {
   @ApiOkResponse({ description: 'Cập nhật vị trí thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được cập nhật vị trí' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Cập nhật vị trí thành công')
   updateLocation(
     @Param('id', ParseIntPipe) id: number,
@@ -122,6 +135,9 @@ export class LocationsController {
   @ApiOkResponse({ description: 'Xóa vị trí thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @ApiForbiddenResponse({ description: 'Không có quyền, chỉ ADMIN mới được xóa vị trí' })
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @SuccessMessage('Xóa vị trí thành công')
   deleteLocation(@Param('id', ParseIntPipe) id: number) {
     return this.locationsService.deleteLocation(id);
