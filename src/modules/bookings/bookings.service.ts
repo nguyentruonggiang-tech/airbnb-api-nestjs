@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -42,12 +44,13 @@ export class BookingsService {
     return this.formatBooking(booking);
   }
 
-  async createBooking(dto: CreateBookingDto) {
+  async createBooking(user: nguoi_dung, dto: CreateBookingDto) {
     const soKhach = dto.so_luong_khach ?? 1;
+    const maNguoiDat = this.getMaNguoiDat(user, dto.ma_nguoi_dat);
 
     await this.checkBookingData(
       dto.ma_phong,
-      dto.ma_nguoi_dat,
+      maNguoiDat,
       dto.ngay_den,
       dto.ngay_di,
     );
@@ -58,20 +61,30 @@ export class BookingsService {
         ngay_den: new Date(dto.ngay_den),
         ngay_di: new Date(dto.ngay_di),
         so_luong_khach: soKhach,
-        ma_nguoi_dat: dto.ma_nguoi_dat,
+        ma_nguoi_dat: maNguoiDat,
       },
     });
 
     return this.formatBooking(booking);
   }
 
-  async updateBooking(id: number, dto: UpdateBookingDto) {
+  async updateBooking(user: nguoi_dung, id: number, dto: UpdateBookingDto) {
     const booking = await this.prisma.dat_phong.findUnique({
       where: { id },
     });
 
     if (!booking) {
       throw new NotFoundException('Không tìm thấy đặt phòng');
+    }
+
+    this.checkQuyen(booking.ma_nguoi_dat, user);
+
+    if (
+      dto.ma_nguoi_dat !== undefined &&
+      user.role !== 'ADMIN' &&
+      dto.ma_nguoi_dat !== user.id
+    ) {
+      throw new ForbiddenException('Bạn không có quyền đổi người đặt');
     }
 
     await this.checkBookingData(
@@ -99,7 +112,7 @@ export class BookingsService {
     return this.formatBooking(updated);
   }
 
-  async deleteBooking(id: number) {
+  async deleteBooking(user: nguoi_dung, id: number) {
     const booking = await this.prisma.dat_phong.findUnique({
       where: { id },
     });
@@ -108,11 +121,33 @@ export class BookingsService {
       throw new NotFoundException('Không tìm thấy đặt phòng');
     }
 
+    this.checkQuyen(booking.ma_nguoi_dat, user);
+
     await this.prisma.dat_phong.delete({
       where: { id },
     });
 
     return this.formatBooking(booking);
+  }
+
+  private getMaNguoiDat(user: nguoi_dung, maNguoiDat?: number) {
+    if (maNguoiDat === undefined) {
+      return user.id;
+    }
+
+    if (user.role === 'ADMIN' || maNguoiDat === user.id) {
+      return maNguoiDat;
+    }
+
+    throw new ForbiddenException('Bạn chỉ có thể đặt phòng cho chính mình');
+  }
+
+  private checkQuyen(maNguoiDat: number, user: nguoi_dung) {
+    if (user.role === 'ADMIN' || maNguoiDat === user.id) {
+      return;
+    }
+
+    throw new ForbiddenException('Bạn không có quyền thao tác đặt phòng này');
   }
 
   private async checkBookingData(

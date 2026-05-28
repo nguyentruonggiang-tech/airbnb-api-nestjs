@@ -31,9 +31,12 @@ export class CreateBookingDto {
   @Min(1, { message: 'Số lượng khách phải lớn hơn 0' })
   so_luong_khach?: number;
 
-  @ApiProperty({ example: 1, description: 'Mã người đặt' })
-  @IsNotEmpty({ message: 'Mã người đặt không được để trống' })
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Mã người đặt. Bỏ qua sẽ lấy từ tài khoản đang đăng nhập',
+  })
+  @IsOptional()
   @IsInt({ message: 'Mã người đặt phải là số nguyên' })
   @Min(1, { message: 'Mã người đặt phải lớn hơn 0' })
-  ma_nguoi_dat: number;
+  ma_nguoi_dat?: number;
 }
