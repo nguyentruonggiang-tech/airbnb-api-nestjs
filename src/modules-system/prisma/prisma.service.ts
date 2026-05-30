@@ -7,14 +7,18 @@ import { PrismaClient } from './generated/prisma/client';
 export class PrismaService extends PrismaClient implements OnModuleInit {
     constructor() {
         const url = new URL(DATABASE_URL as string);
-
+        console.log(url);
+        const params = new URLSearchParams(url.search);
+        const sslAccept = params.get('sslaccept');
         const adapter = new PrismaMariaDb({
             user: url.username,
             password: url.password,
             host: url.hostname,
             port: Number(url.port),
             database: url.pathname.substring(1),
-            allowPublicKeyRetrieval: true
+            ...(sslAccept ? { ssl: { rejectUnauthorized: sslAccept === 'strict' } } : {}),
+            ...(params.get('connection_limit') ? { connectionLimit: Number(params.get('connection_limit')) } : {}),
+            connectTimeout: 30000,
         });
 
         super({ adapter });
