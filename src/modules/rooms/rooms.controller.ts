@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiForbiddenResponse,
@@ -69,7 +68,7 @@ export class RoomsController {
   }
 
   @Post()
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Tạo phòng mới' })
   @ApiOkResponse({ description: 'Tạo phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
@@ -83,7 +82,7 @@ export class RoomsController {
   }
 
   @Post('upload-hinh-phong/:id')
-  @ApiBearerAuth()
+
   @UseInterceptors(FileInterceptor('hinhAnh'))
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
@@ -114,7 +113,7 @@ export class RoomsController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Cập nhật phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
   @ApiOkResponse({ description: 'Cập nhật phòng thành công' })
@@ -132,7 +131,7 @@ export class RoomsController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Xóa phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
   @ApiOkResponse({ description: 'Xóa phòng thành công' })
