@@ -1,5 +1,5 @@
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional, ApiSchema } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
 
 @ApiSchema({ name: 'TaoBinhLuan' })
 export class CreateCommentDto {
@@ -9,11 +9,14 @@ export class CreateCommentDto {
   @Min(1, { message: 'Mã phòng phải lớn hơn 0' })
   ma_phong: number;
 
-  @ApiProperty({ example: 1, description: 'Mã người bình luận' })
-  @IsNotEmpty({ message: 'Mã người bình luận không được để trống' })
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Mã người bình luận. Bỏ qua sẽ lấy từ tài khoản đang đăng nhập',
+  })
+  @IsOptional()
   @IsInt({ message: 'Mã người bình luận phải là số nguyên' })
   @Min(1, { message: 'Mã người bình luận phải lớn hơn 0' })
-  ma_nguoi_binh_luan: number;
+  ma_nguoi_binh_luan?: number;
 
   @ApiProperty({ example: 'Phòng rất đẹp và sạch sẽ', description: 'Nội dung bình luận' })
   @IsNotEmpty({ message: 'Nội dung không được để trống' })

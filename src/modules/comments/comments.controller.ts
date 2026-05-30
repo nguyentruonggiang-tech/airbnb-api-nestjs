@@ -11,6 +11,7 @@ import {
     Query,
 } from '@nestjs/common';
 import {
+    ApiBearerAuth,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
@@ -19,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
+import { User } from 'src/common/decorators/user.decorator';
+import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -62,35 +65,42 @@ export class CommentsController {
     }
 
     @Post()
-    @Public()
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Tạo bình luận mới' })
     @ApiOkResponse({ description: 'Tạo bình luận thành công' })
     @SuccessMessage('Tạo bình luận thành công')
-    createComment(@Body() createCommentDto: CreateCommentDto) {
-        return this.commentsService.createComment(createCommentDto);
+    createComment(
+        @User() user: nguoi_dung,
+        @Body() createCommentDto: CreateCommentDto,
+    ) {
+        return this.commentsService.createComment(user, createCommentDto);
     }
 
     @Put(':id')
-    @Public()
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Cập nhật bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Cập nhật bình luận thành công' })
     @SuccessMessage('Cập nhật bình luận thành công')
     updateComment(
+        @User() user: nguoi_dung,
         @Param('id', ParseIntPipe) id: number,
         @Body() updateCommentDto: UpdateCommentDto,
     ) {
-        return this.commentsService.updateComment(id, updateCommentDto);
+        return this.commentsService.updateComment(user, id, updateCommentDto);
     }
 
     @Delete(':id')
-    @Public()
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Xóa bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Xóa bình luận thành công' })
     @SuccessMessage('Xóa bình luận thành công')
-    deleteComment(@Param('id', ParseIntPipe) id: number) {
-        return this.commentsService.deleteComment(id);
+    deleteComment(
+        @User() user: nguoi_dung,
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return this.commentsService.deleteComment(user, id);
     }
 
     @Get('lay-binh-luan-theo-phong/:maPhong')
