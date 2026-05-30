@@ -80,4 +80,24 @@ export class CommentsService {
 
     return comment;
   }
+
+  async getCommentsByRoom(maPhong: number) {
+    await this.checkPhong(maPhong);
+
+    return this.prisma.binh_luan.findMany({
+      where: { ma_phong: maPhong },
+      orderBy: { id: 'desc' },
+    });
+  }
+
+  private async checkPhong(ma_phong: number) {
+    const phong = await this.prisma.phong.findUnique({
+      where: { id: ma_phong },
+      select: { id: true },
+    });
+
+    if (!phong) {
+      throw new NotFoundException('Không tìm thấy phòng');
+    }
+  }
 }

@@ -92,4 +92,19 @@ export class CommentsController {
     deleteComment(@Param('id', ParseIntPipe) id: number) {
         return this.commentsService.deleteComment(id);
     }
+
+    @Get('lay-binh-luan-theo-phong/:maPhong')
+    @Public()
+    @ApiOperation({ summary: 'Lấy danh sách bình luận theo phòng' })
+    @ApiParam({
+        name: 'maPhong',
+        type: Number,
+        example: 1,
+        description: 'Mã phòng',
+    })
+    @ApiOkResponse({ description: 'Lấy danh sách bình luận theo phòng thành công' })
+    @SuccessMessage('Lấy danh sách bình luận theo phòng thành công')
+    getCommentsByRoom(@Param('maPhong', ParseIntPipe) maPhong: number) {
+        return this.commentsService.getCommentsByRoom(maPhong);
+    }
 }
