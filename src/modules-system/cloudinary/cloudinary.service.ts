@@ -4,6 +4,10 @@ import {
     CLOUDINARY_FOLDER,
     CLOUDINARY_URL,
 } from 'src/common/constant/cloudinary.constant';
+import {
+    UPLOAD_ALLOWED_MIME_TYPES,
+    UPLOAD_MAX_SIZE_BYTES,
+} from 'src/common/constant/upload.constant';
 
 export type UploadImageResult = {
     url: string;
@@ -31,6 +35,20 @@ export class CloudinaryService {
         });
 
         return cloudinary.url(publicId, { secure: true });
+    }
+
+    validateImageFile(file?: Express.Multer.File): void {
+        if (!file) {
+            throw new BadRequestException('Vui lòng chọn file ảnh');
+        }
+
+        if (!UPLOAD_ALLOWED_MIME_TYPES.includes(file.mimetype as typeof UPLOAD_ALLOWED_MIME_TYPES[number])) {
+            throw new BadRequestException('File phải là ảnh (jpeg, png, gif, webp)');
+        }
+
+        if (file.size > UPLOAD_MAX_SIZE_BYTES) {
+            throw new BadRequestException('Kích thước file không được vượt quá 5MB');
+        }
     }
 
     uploadImage(file: Express.Multer.File, folder?: string): Promise<UploadImageResult> {

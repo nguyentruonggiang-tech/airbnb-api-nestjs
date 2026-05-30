@@ -1,14 +1,9 @@
 import {
-    BadRequestException,
     ConflictException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import {
-    AVATAR_ALLOWED_MIME_TYPES,
-    AVATAR_MAX_SIZE_BYTES,
-} from 'src/common/constant/upload.constant';
 import { buildQueryPrisma } from 'src/common/helpers/build-query-prisma.helper';
 import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
@@ -112,22 +107,11 @@ export class LocationsService {
     }
 
     async uploadLocationImage(id: number, file?: Express.Multer.File) {
-        if (!file) {
-            throw new BadRequestException('Vui lòng chọn file ảnh');
-        }
-
-        const allowedTypes: string[] = [...AVATAR_ALLOWED_MIME_TYPES];
-        if (!allowedTypes.includes(file.mimetype)) {
-            throw new BadRequestException('File phải là ảnh (jpeg, png, gif, webp)');
-        }
-
-        if (file.size > AVATAR_MAX_SIZE_BYTES) {
-            throw new BadRequestException('Kích thước file không được vượt quá 5MB');
-        }
+        this.cloudinaryService.validateImageFile(file);
 
         await this.getLocationById(id);
 
-        const { publicId } = await this.cloudinaryService.uploadImage(file, 'locations');
+        const { publicId } = await this.cloudinaryService.uploadImage(file!, 'locations');
 
         const updatedLocation = await this.prisma.vi_tri.update({
             where: { id },
