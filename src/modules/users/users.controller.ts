@@ -34,6 +34,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UsersService } from './users.service';
 
 @ApiTags('NguoiDung')
@@ -77,6 +78,18 @@ export class UsersController {
         @Req() req: Request,
     ) {
         return this.usersService.searchUsers(keyword, req);
+    }
+
+    @Put('profile')
+    @ApiOperation({ summary: 'Cập nhật profile của tôi' })
+    @ApiOkResponse({ description: 'Cập nhật profile thành công' })
+    @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+    @SuccessMessage('Cập nhật profile thành công')
+    updateProfile(
+        @User() user: nguoi_dung,
+        @Body() updateProfileDto: UpdateProfileDto,
+    ) {
+        return this.usersService.updateProfile(user.id, updateProfileDto);
     }
 
     @Post('upload-avatar')
