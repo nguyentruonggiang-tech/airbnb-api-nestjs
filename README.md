@@ -54,22 +54,31 @@ npm run start:dev
 
 | Email | Role |
 |-------|------|
-| `admin@airbnb.com` | ADMIN |
-| `user1@airbnb.com` | USER |
-| `user2@airbnb.com` | USER |
-| `user3@airbnb.com` | USER |
+| `admin@gmail.com` | ADMIN |
+| `user1@gmail.com` | USER |
+| `user2@gmail.com` | USER |
+| `user3@gmail.com` | USER |
 
 ## Environment
 
 | Variable | Description |
 |----------|-------------|
 | `PORT` | Server port (default `3069`) |
-| `DATABASE_URL` | MySQL connection string |
+| `DATABASE_URL` | MySQL connection string (see optional query params below) |
 | `ACCESS_TOKEN_SECRET` / `ACCESS_EXPIRES_IN` | Access JWT |
 | `REFRESH_TOKEN_SECRET` / `REFRESH_EXPIRES_IN` | Refresh JWT |
 | `CLOUDINARY_URL` / `CLOUDINARY_FOLDER` | Image upload |
 
+**`DATABASE_URL` optional query params** (parsed by `PrismaService`):
+
+| Param | Example | Description |
+|-------|---------|-------------|
+| `sslaccept` | `strict` | Enable SSL (`rejectUnauthorized: true`) |
+| `connection_limit` | `5` | MariaDB pool size |
+
 ## Prisma (DB First)
+
+Prisma 7 reads `DATABASE_URL` from `prisma.config.ts` (not `schema.prisma`).
 
 ```bash
 npx prisma db pull   # after MySQL schema changes
@@ -80,6 +89,7 @@ Do not use `prisma migrate`.
 
 ## Authentication
 
+- `POST /api/auth/signup` — do **not** send `role`; the server assigns `USER` automatically. Use Swagger schema **`DangKyTaiKhoan`** (not the admin create-user schema).
 - `POST /api/auth/signin` sets cookies `accessToken` and `refreshToken`.
 - Protected routes read cookies automatically (enable cookies in Swagger / Postman).
 - `POST /api/auth/signout` clears cookies.
@@ -130,4 +140,5 @@ src/
 └── modules-system/   prisma, token, cloudinary
 database/             init.sql, seed.sql
 prisma/               schema (db pull)
+prisma.config.ts      Prisma 7 datasource URL
 ```

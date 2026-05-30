@@ -11,10 +11,10 @@ TRUNCATE TABLE nguoi_dung;
 SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO nguoi_dung (name, email, pass_word, phone, birth_day, gender, role) VALUES
-('Admin Airbnb', 'admin@airbnb.com', '$2y$10$LzHmTXO7elsGT26Bpz42ge2aTfV1mqjV3cJBLTp/lz7HAKF1Mxlku', '0901000001', '1990-01-15', 'Nam', 'ADMIN'),
-('Nguyen Van A', 'user1@airbnb.com', '$2y$10$LzHmTXO7elsGT26Bpz42ge2aTfV1mqjV3cJBLTp/lz7HAKF1Mxlku', '0902000002', '1995-06-20', 'Nam', 'USER'),
-('Tran Thi B', 'user2@airbnb.com', '$2y$10$LzHmTXO7elsGT26Bpz42ge2aTfV1mqjV3cJBLTp/lz7HAKF1Mxlku', '0903000003', '1998-03-10', 'Nữ', 'USER'),
-('Le Van C', 'user3@airbnb.com', '$2y$10$LzHmTXO7elsGT26Bpz42ge2aTfV1mqjV3cJBLTp/lz7HAKF1Mxlku', '0904000004', '1992-11-25', 'Nam', 'USER');
+('Admin Airbnb', 'admin@gmail.com', '$2b$10$wjihJlEvLYlb5d4d71fPD.KhJYGCy.PbhqaHp8T7m/GYzQSOn5Kxm', '0901000001', '1990-01-15', 'Nam', 'ADMIN'),
+('Nguyen Van A', 'user1@gmail.com', '$2b$10$wjihJlEvLYlb5d4d71fPD.KhJYGCy.PbhqaHp8T7m/GYzQSOn5Kxm', '0902000002', '1995-06-20', 'Nam', 'USER'),
+('Tran Thi B', 'user2@gmail.com', '$2b$10$wjihJlEvLYlb5d4d71fPD.KhJYGCy.PbhqaHp8T7m/GYzQSOn5Kxm', '0903000003', '1998-03-10', 'Nữ', 'USER'),
+('Le Van C', 'user3@gmail.com', '$2b$10$wjihJlEvLYlb5d4d71fPD.KhJYGCy.PbhqaHp8T7m/GYzQSOn5Kxm', '0904000004', '1992-11-25', 'Nam', 'USER');
 
 INSERT INTO vi_tri (ten_vi_tri, tinh_thanh, quoc_gia, hinh_anh) VALUES
 ('Quận 1', 'Hồ Chí Minh', 'Việt Nam', 'img/locations/q1.jpg'),
