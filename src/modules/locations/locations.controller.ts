@@ -14,7 +14,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import {
-  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiForbiddenResponse,
@@ -69,7 +68,7 @@ export class LocationsController {
   }
 
   @Post()
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Tạo vị trí mới' })
   @ApiOkResponse({ description: 'Tạo vị trí thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
@@ -82,7 +81,7 @@ export class LocationsController {
   }
 
   @Post('upload-hinh-vitri/:id')
-  @ApiBearerAuth()
+
   @UseInterceptors(FileInterceptor('hinhAnh'))
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID vị trí' })
@@ -113,7 +112,7 @@ export class LocationsController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Cập nhật vị trí' })
   @ApiOkResponse({ description: 'Cập nhật vị trí thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
@@ -130,7 +129,7 @@ export class LocationsController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Xóa vị trí' })
   @ApiOkResponse({ description: 'Xóa vị trí thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })

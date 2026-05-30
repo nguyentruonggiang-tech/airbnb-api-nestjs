@@ -5,10 +5,12 @@ import { AppModule } from './app.module';
 import { PORT } from './common/constant/app.constant';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(helmet());
   app.use(cookieParser());
   
   app.setGlobalPrefix('api');
@@ -25,7 +27,6 @@ async function bootstrap() {
     .setTitle('Airbnb API')
     .setDescription('The Airbnb API description')
     .setVersion('1.0')
-    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

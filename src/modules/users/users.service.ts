@@ -177,7 +177,7 @@ export class UsersService {
             throw new NotFoundException('Không tìm thấy người dùng');
         }
 
-        const { url, publicId } = await this.cloudinaryService.uploadImage(file, 'avatars');
+        const { publicId } = await this.cloudinaryService.uploadImage(file, 'avatars');
 
         const updatedUser = await this.prisma.nguoi_dung.update({
             where: { id: userId },

@@ -11,7 +11,6 @@ import {
     Query,
 } from '@nestjs/common';
 import {
-    ApiBearerAuth,
     ApiForbiddenResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
@@ -85,7 +84,7 @@ export class CommentsController {
     }
 
     @Post()
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Tạo bình luận mới' })
     @ApiOkResponse({ description: 'Tạo bình luận thành công' })
     @ApiNotFoundResponse({ description: 'Không tìm thấy phòng hoặc người dùng' })
@@ -102,7 +101,7 @@ export class CommentsController {
     }
 
     @Put(':id')
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Cập nhật bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Cập nhật bình luận thành công' })
@@ -119,7 +118,7 @@ export class CommentsController {
     }
 
     @Delete(':id')
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Xóa bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Xóa bình luận thành công' })

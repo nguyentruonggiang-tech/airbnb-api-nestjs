@@ -9,7 +9,6 @@ import {
   Put,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -68,7 +67,7 @@ export class BookingsController {
   }
 
   @Post()
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Tạo đặt phòng mới' })
   @ApiOkResponse({ description: 'Tạo đặt phòng thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
@@ -84,7 +83,7 @@ export class BookingsController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Cập nhật đặt phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID đặt phòng' })
   @ApiOkResponse({ description: 'Cập nhật đặt phòng thành công' })
@@ -103,7 +102,7 @@ export class BookingsController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
+
   @ApiOperation({ summary: 'Xóa đặt phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID đặt phòng' })
   @ApiOkResponse({ description: 'Xóa đặt phòng thành công' })

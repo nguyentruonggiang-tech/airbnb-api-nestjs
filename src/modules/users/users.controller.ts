@@ -15,7 +15,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import {
-    ApiBearerAuth,
     ApiBody,
     ApiConsumes,
     ApiForbiddenResponse,
@@ -81,7 +80,7 @@ export class UsersController {
     }
 
     @Post('upload-avatar')
-    @ApiBearerAuth()
+
     @UseInterceptors(FileInterceptor('avatar'))
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -117,7 +116,7 @@ export class UsersController {
     }
 
     @Post()
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Tạo người dùng' })
     @ApiOkResponse({
         description: 'Tạo người dùng thành công',
@@ -136,7 +135,7 @@ export class UsersController {
     }
 
     @Put(':id')
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Cập nhật người dùng' })
     @ApiOkResponse({
         description: 'Cập nhật người dùng thành công',
@@ -159,7 +158,7 @@ export class UsersController {
     }
 
     @Delete(':id')
-    @ApiBearerAuth()
+
     @ApiOperation({ summary: 'Xóa người dùng' })
     @ApiOkResponse({ description: 'Xóa người dùng thành công' })
     @ApiNotFoundResponse({ description: 'Không tìm thấy người dùng' })
