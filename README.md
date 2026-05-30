@@ -20,12 +20,32 @@ cp .env.example .env
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS airbnb_db;"
 mysql -u root -p airbnb_db < database/init.sql
 
+# Optional: demo data (dev only — truncates tables)
+mysql -u root -p airbnb_db < database/seed.sql
+
 npx prisma generate
 npm run start:dev
 ```
 
 - API: `http://localhost:3069/api`
 - Swagger: `http://localhost:3069/api-docs`
+
+## Database scripts
+
+| File | Purpose |
+|------|---------|
+| `database/init.sql` | Create tables (fresh setup) |
+| `database/seed.sql` | Sample data for local demo |
+| `database/add-avatar-column.sql` | Add `avatar` column to existing DB (skip if you use current `init.sql`) |
+
+**Seed logins** (after running `seed.sql`): password `123456`
+
+| Email | Role |
+|-------|------|
+| `admin@airbnb.com` | ADMIN |
+| `user1@airbnb.com` | USER |
+| `user2@airbnb.com` | USER |
+| `user3@airbnb.com` | USER |
 
 ## Environment
 
