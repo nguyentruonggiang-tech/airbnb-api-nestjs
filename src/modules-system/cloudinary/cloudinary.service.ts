@@ -22,7 +22,7 @@ export class CloudinaryService {
         }
 
         if (!CLOUDINARY_URL) {
-            return null;
+            return publicId;
         }
 
         cloudinary.config({
