@@ -57,6 +57,22 @@ export class CommentsController {
         return this.commentsService.getCommentsByPage(page, pageSize);
     }
 
+    @Get('lay-binh-luan-theo-phong/:maPhong')
+    @Public()
+    @ApiOperation({ summary: 'Lấy danh sách bình luận theo phòng' })
+    @ApiParam({
+        name: 'maPhong',
+        type: Number,
+        example: 1,
+        description: 'Mã phòng',
+    })
+    @ApiOkResponse({ description: 'Lấy danh sách bình luận theo phòng thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
+    @SuccessMessage('Lấy danh sách bình luận theo phòng thành công')
+    getCommentsByRoom(@Param('maPhong', ParseIntPipe) maPhong: number) {
+        return this.commentsService.getCommentsByRoom(maPhong);
+    }
+
     @Get(':id')
     @Public()
     @ApiOperation({ summary: 'Lấy thông tin bình luận theo id' })
@@ -116,21 +132,5 @@ export class CommentsController {
         @Param('id', ParseIntPipe) id: number,
     ) {
         return this.commentsService.deleteComment(user, id);
-    }
-
-    @Get('lay-binh-luan-theo-phong/:maPhong')
-    @Public()
-    @ApiOperation({ summary: 'Lấy danh sách bình luận theo phòng' })
-    @ApiParam({
-        name: 'maPhong',
-        type: Number,
-        example: 1,
-        description: 'Mã phòng',
-    })
-    @ApiOkResponse({ description: 'Lấy danh sách bình luận theo phòng thành công' })
-    @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
-    @SuccessMessage('Lấy danh sách bình luận theo phòng thành công')
-    getCommentsByRoom(@Param('maPhong', ParseIntPipe) maPhong: number) {
-        return this.commentsService.getCommentsByRoom(maPhong);
     }
 }
