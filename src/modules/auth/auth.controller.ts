@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Res, Req, Get } from '@nestjs/common';
+import { Controller, Body, Post, Res, Req, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
@@ -9,6 +9,7 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
 import { SigninDto } from './dto/signin.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
@@ -27,6 +28,7 @@ export class AuthController {
     }
 
     @Post('signin')
+    @HttpCode(HttpStatus.OK)
     @Public()
     @ApiOperation({ summary: 'Đăng nhập' })
     @ApiOkResponse({ description: 'Set cookie accessToken, refreshToken. Body trả true.' })
@@ -42,6 +44,7 @@ export class AuthController {
     }
 
     @Post('refresh-token')
+    @HttpCode(HttpStatus.OK)
     @Public()
     @ApiOperation({ summary: 'Làm mới accessToken' })
     @ApiOkResponse({ description: 'Đọc cookie cũ, set cookie mới. Body trả true.' })
@@ -53,6 +56,17 @@ export class AuthController {
         const result = await this.authService.refreshToken(req);
         res.cookie('accessToken', result.accessToken);
         res.cookie('refreshToken', result.refreshToken);
+        return true;
+    }
+
+    @Post('signout')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Đăng xuất' })
+    @ApiOkResponse({ description: 'Đăng xuất tài khoản thành công' })
+    @SuccessMessage('Đăng xuất tài khoản thành công')
+    signout(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
         return true;
     }
 
