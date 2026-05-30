@@ -13,6 +13,7 @@ import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 type UserWithoutPassword = Prisma.nguoi_dungGetPayload<{
     omit: { pass_word: true };
@@ -122,6 +123,30 @@ export class UsersService {
                 gender,
                 role: role ?? 'USER',
             },
+            omit: this.userOmit,
+        });
+
+        return this.formatUser(user);
+    }
+
+    async updateProfile(userId: number, dto: UpdateProfileDto) {
+        const existingUser = await this.prisma.nguoi_dung.findUnique({
+            where: { id: userId },
+        });
+
+        if (!existingUser) {
+            throw new NotFoundException('Không tìm thấy người dùng');
+        }
+
+        if (dto.email && dto.email !== existingUser.email) {
+            await this.ensureEmailUnique(dto.email, userId);
+        }
+
+        const data = await this.buildUpdateData(dto);
+
+        const user = await this.prisma.nguoi_dung.update({
+            where: { id: userId },
+            data,
             omit: this.userOmit,
         });
 
