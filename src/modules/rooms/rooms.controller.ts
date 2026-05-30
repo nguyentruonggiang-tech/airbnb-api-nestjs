@@ -29,6 +29,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { CheckAvailabilityDto } from './dto/check-availability.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { GetRoomsQueryDto } from './dto/get-rooms-query.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -65,6 +66,22 @@ export class RoomsController {
   @SuccessMessage('Lấy danh sách phòng theo vị trí thành công')
   getRoomsByLocation(@Param('maViTri', ParseIntPipe) maViTri: number) {
     return this.roomsService.getRoomsByLocation(maViTri);
+  }
+
+  @Get(':id/kiem-tra-trong')
+  @Public()
+  @ApiOperation({ summary: 'Kiểm tra phòng trống theo ngày' })
+  @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
+  @ApiQuery({ name: 'ngay_den', required: true, type: String, example: '2026-06-01' })
+  @ApiQuery({ name: 'ngay_di', required: true, type: String, example: '2026-06-05' })
+  @ApiOkResponse({ description: 'Kết quả kiểm tra phòng trống' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
+  @SuccessMessage('Kiểm tra phòng trống thành công')
+  checkAvailability(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() dto: CheckAvailabilityDto,
+  ) {
+    return this.roomsService.checkAvailability(id, dto);
   }
 
   @Get(':id')

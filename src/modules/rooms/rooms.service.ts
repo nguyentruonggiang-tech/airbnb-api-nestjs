@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,6 +7,7 @@ import {
 import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
+import { CheckAvailabilityDto } from './dto/check-availability.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { GetRoomsQueryDto } from './dto/get-rooms-query.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -57,6 +59,48 @@ export class RoomsService {
       totalItem,
       totalPage: Math.ceil(totalItem / pageSize),
       items: items.map((item) => this.formatRoom(item)),
+    };
+  }
+
+  async checkAvailability(id: number, dto: CheckAvailabilityDto) {
+    await this.getRoomById(id);
+
+    const ngayDen = new Date(dto.ngay_den);
+    const ngayDi = new Date(dto.ngay_di);
+
+    if (ngayDi <= ngayDen) {
+      throw new BadRequestException('Ngày đi phải sau ngày đến');
+    }
+
+    const dat_phong_trung = await this.prisma.dat_phong.findMany({
+      where: {
+        ma_phong: id,
+        ngay_den: { lt: ngayDi },
+        ngay_di: { gt: ngayDen },
+      },
+      select: {
+        id: true,
+        ngay_den: true,
+        ngay_di: true,
+        so_luong_khach: true,
+      },
+    });
+
+    const con_trong = dat_phong_trung.length === 0;
+
+    return {
+      con_trong,
+      ngay_den: dto.ngay_den,
+      ngay_di: dto.ngay_di,
+      ...(con_trong
+        ? {}
+        : {
+            dat_phong_trung: dat_phong_trung.map((b) => ({
+              ...b,
+              ngay_den: b.ngay_den.toISOString().slice(0, 10),
+              ngay_di: b.ngay_di.toISOString().slice(0, 10),
+            })),
+          }),
     };
   }
 
