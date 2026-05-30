@@ -20,6 +20,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         super({ adapter });
     }
 
+    isForeignKeyConstraintError(error: unknown): boolean {
+        if (!error || typeof error !== 'object') return false;
+        return (error as { code?: string }).code === 'P2003';
+    }
+
     async onModuleInit() {
         try {
             await this.$queryRaw`SELECT 1+1 AS result`;

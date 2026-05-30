@@ -126,7 +126,7 @@ export class RoomsService {
         where: { id },
       });
     } catch (error) {
-      if (this.isForeignKeyConstraintError(error)) {
+      if (this.prisma.isForeignKeyConstraintError(error)) {
         throw new ConflictException(
           'Không thể xóa phòng vì đang có dữ liệu đặt phòng hoặc bình luận liên quan',
         );
@@ -162,15 +162,6 @@ export class RoomsService {
     if (!location) {
       throw new NotFoundException('Không tìm thấy vị trí');
     }
-  }
-
-  private isForeignKeyConstraintError(error: unknown): boolean {
-    if (!error || typeof error !== 'object') {
-      return false;
-    }
-
-    const prismaError = error as { code?: string };
-    return prismaError.code === 'P2003';
   }
 
   private formatRoom<T extends { hinh_anh: string | null }>(room: T): T {

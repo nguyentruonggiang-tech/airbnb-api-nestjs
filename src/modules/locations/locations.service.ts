@@ -94,7 +94,7 @@ export class LocationsService {
                 where: { id },
             });
         } catch (error) {
-            if (this.isForeignKeyConstraintError(error)) {
+            if (this.prisma.isForeignKeyConstraintError(error)) {
                 throw new ConflictException(
                     'Không thể xóa vị trí vì đang có phòng liên quan',
                 );
@@ -128,12 +128,4 @@ export class LocationsService {
         };
     }
 
-    private isForeignKeyConstraintError(error: unknown): boolean {
-        if (!error || typeof error !== 'object') {
-            return false;
-        }
-
-        const prismaError = error as { code?: string };
-        return prismaError.code === 'P2003';
-    }
 }
