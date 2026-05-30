@@ -12,11 +12,14 @@ import {
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
+    ApiForbiddenResponse,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
     ApiQuery,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { SuccessMessage } from 'src/common/decorators/success-message.decorator';
@@ -59,6 +62,7 @@ export class CommentsController {
     @ApiOperation({ summary: 'Lấy thông tin bình luận theo id' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Lấy thông tin bình luận thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy bình luận' })
     @SuccessMessage('Lấy thông tin bình luận thành công')
     getCommentById(@Param('id', ParseIntPipe) id: number) {
         return this.commentsService.getCommentById(id);
@@ -68,6 +72,11 @@ export class CommentsController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Tạo bình luận mới' })
     @ApiOkResponse({ description: 'Tạo bình luận thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy phòng hoặc người dùng' })
+    @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+    @ApiForbiddenResponse({
+        description: 'Không có quyền bình luận bằng tài khoản người khác',
+    })
     @SuccessMessage('Tạo bình luận thành công')
     createComment(
         @User() user: nguoi_dung,
@@ -81,6 +90,9 @@ export class CommentsController {
     @ApiOperation({ summary: 'Cập nhật bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Cập nhật bình luận thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy bình luận' })
+    @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+    @ApiForbiddenResponse({ description: 'Không có quyền cập nhật bình luận này' })
     @SuccessMessage('Cập nhật bình luận thành công')
     updateComment(
         @User() user: nguoi_dung,
@@ -95,6 +107,9 @@ export class CommentsController {
     @ApiOperation({ summary: 'Xóa bình luận' })
     @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID bình luận' })
     @ApiOkResponse({ description: 'Xóa bình luận thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy bình luận' })
+    @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+    @ApiForbiddenResponse({ description: 'Không có quyền xóa bình luận này' })
     @SuccessMessage('Xóa bình luận thành công')
     deleteComment(
         @User() user: nguoi_dung,
@@ -113,6 +128,7 @@ export class CommentsController {
         description: 'Mã phòng',
     })
     @ApiOkResponse({ description: 'Lấy danh sách bình luận theo phòng thành công' })
+    @ApiNotFoundResponse({ description: 'Không tìm thấy phòng' })
     @SuccessMessage('Lấy danh sách bình luận theo phòng thành công')
     getCommentsByRoom(@Param('maPhong', ParseIntPipe) maPhong: number) {
         return this.commentsService.getCommentsByRoom(maPhong);
