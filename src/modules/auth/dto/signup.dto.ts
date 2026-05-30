@@ -12,7 +12,7 @@ import {
 export const GENDER_VALUES = ['Nam', 'Nữ'] as const;
 export type Gender = (typeof GENDER_VALUES)[number];
 
-@ApiSchema({ name: 'ThongTinNguoiDung' })
+@ApiSchema({ name: 'DangKyTaiKhoan' })
 export class SignupDto {
     @ApiProperty({ example: 'Nguyen Van A' })
     @IsNotEmpty({ message: 'Họ tên không được để trống' })

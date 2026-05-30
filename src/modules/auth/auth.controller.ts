@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import {
+    ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
@@ -22,6 +23,7 @@ export class AuthController {
     @Post('signup')
     @Public()
     @ApiOperation({ summary: 'Đăng ký tài khoản' })
+    @ApiBody({ type: SignupDto })
     @ApiCreatedResponse({ description: 'Đăng ký tài khoản thành công' })
     async signup(@Body() signupDto: SignupDto) {
         return this.authService.signup(signupDto);
