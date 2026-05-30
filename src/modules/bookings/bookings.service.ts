@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -92,6 +93,7 @@ export class BookingsService {
       dto.ma_nguoi_dat ?? booking.ma_nguoi_dat,
       dto.ngay_den ?? booking.ngay_den,
       dto.ngay_di ?? booking.ngay_di,
+      id,
     );
 
     const updated = await this.prisma.dat_phong.update({
@@ -155,12 +157,32 @@ export class BookingsService {
     ma_nguoi_dat: number,
     ngay_den: string | Date,
     ngay_di: string | Date,
+    excludeId?: number,
   ) {
     await this.prisma.checkPhongExists(ma_phong);
     await this.prisma.checkUserExists(ma_nguoi_dat);
 
-    if (new Date(ngay_di) <= new Date(ngay_den)) {
+    const ngayDen = new Date(ngay_den);
+    const ngayDi = new Date(ngay_di);
+
+    if (ngayDi <= ngayDen) {
       throw new BadRequestException('Ngày đi phải sau ngày đến');
+    }
+
+    const da_dat = await this.prisma.dat_phong.findFirst({
+      where: {
+        ma_phong,
+        ngay_den: { lt: ngayDi },
+        ngay_di: { gt: ngayDen },
+        ...(excludeId ? { NOT: { id: excludeId } } : {}),
+      },
+      select: { id: true, ngay_den: true, ngay_di: true },
+    });
+
+    if (da_dat) {
+      throw new ConflictException(
+        `Phòng đã được đặt từ ${da_dat.ngay_den.toISOString().slice(0, 10)} đến ${da_dat.ngay_di.toISOString().slice(0, 10)}`,
+      );
     }
   }
 
