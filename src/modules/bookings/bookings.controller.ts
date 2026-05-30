@@ -9,6 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import {
+  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -80,9 +81,8 @@ export class BookingsController {
   @ApiOperation({ summary: 'Tạo đặt phòng mới' })
   @ApiOkResponse({ description: 'Tạo đặt phòng thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
-  @ApiForbiddenResponse({
-    description: 'Không có quyền đặt phòng cho người khác',
-  })
+  @ApiForbiddenResponse({ description: 'Không có quyền đặt phòng cho người khác' })
+  @ApiConflictResponse({ description: 'Phòng đã được đặt trong khoảng thời gian này' })
   @SuccessMessage('Tạo đặt phòng thành công')
   createBooking(
     @User() user: nguoi_dung,
@@ -98,9 +98,8 @@ export class BookingsController {
   @ApiOkResponse({ description: 'Cập nhật đặt phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy đặt phòng' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
-  @ApiForbiddenResponse({
-    description: 'Không có quyền cập nhật đặt phòng này',
-  })
+  @ApiForbiddenResponse({ description: 'Không có quyền cập nhật đặt phòng này' })
+  @ApiConflictResponse({ description: 'Phòng đã được đặt trong khoảng thời gian này' })
   @SuccessMessage('Cập nhật đặt phòng thành công')
   updateBooking(
     @User() user: nguoi_dung,
