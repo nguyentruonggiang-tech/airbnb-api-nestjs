@@ -33,7 +33,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(PORT || 3069, () => {
-    console.log(`🎯 Start BE successfuly at http://localhost:${PORT}`);
+    console.log(`🎯 Start BE successfully at http://localhost:${PORT}`);
   });
 }
 

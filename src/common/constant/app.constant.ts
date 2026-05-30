@@ -12,3 +12,5 @@ export const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN ?? '7d';
 
 
 export const DEFAULT_SUCCESS_MESSAGE = 'Xử lý thành công';
+
+export const BCRYPT_SALT_ROUNDS = 10;

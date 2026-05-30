@@ -3,6 +3,7 @@ import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
 import { TokenService } from 'src/modules-system/token/token.service';
 import * as bcrypt from 'bcrypt';
+import { BCRYPT_SALT_ROUNDS } from 'src/common/constant/app.constant';
 import { SigninDto } from './dto/signin.dto';
 import { Request } from 'express';
 
@@ -26,7 +27,7 @@ export class AuthService {
             throw new ConflictException('Email đã được sử dụng');
         }
 
-        const hashedPassword = await bcrypt.hash(pass_word, 10);
+        const hashedPassword = await bcrypt.hash(pass_word, BCRYPT_SALT_ROUNDS);
         const user = await this.prisma.nguoi_dung.create({
             data: {
                 name,

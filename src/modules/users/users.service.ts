@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import * as bcrypt from 'bcrypt';
+import { BCRYPT_SALT_ROUNDS } from 'src/common/constant/app.constant';
 import { buildQueryPrisma } from 'src/common/helpers/build-query-prisma.helper';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
@@ -113,7 +114,7 @@ export class UsersService {
 
         await this.ensureEmailUnique(email);
 
-        const hashedPassword = await bcrypt.hash(pass_word, 10);
+        const hashedPassword = await bcrypt.hash(pass_word, BCRYPT_SALT_ROUNDS);
 
         const user = await this.prisma.nguoi_dung.create({
             data: {
@@ -237,7 +238,7 @@ export class UsersService {
         const data: Prisma.nguoi_dungUpdateInput = { ...rest };
 
         if (pass_word) {
-            data.pass_word = await bcrypt.hash(pass_word, 10);
+            data.pass_word = await bcrypt.hash(pass_word, BCRYPT_SALT_ROUNDS);
         }
 
         if (birth_day !== undefined) {
