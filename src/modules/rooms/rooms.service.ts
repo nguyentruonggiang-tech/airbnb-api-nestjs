@@ -60,6 +60,17 @@ export class RoomsService {
     };
   }
 
+  async getRoomsByLocation(maViTri: number) {
+    await this.ensureLocationExists(maViTri);
+
+    const items = await this.prisma.phong.findMany({
+      where: { ma_vi_tri: maViTri },
+      orderBy: { id: 'desc' },
+    });
+
+    return items.map((item) => this.formatRoom(item));
+  }
+
   async getRoomById(id: number) {
     const room = await this.prisma.phong.findUnique({
       where: { id },
