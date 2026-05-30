@@ -46,7 +46,10 @@ export class CommentsService {
     return comment;
   }
 
-  createComment(dto: CreateCommentDto) {
+  async createComment(dto: CreateCommentDto) {
+    await this.checkPhong(dto.ma_phong);
+    await this.checkUserExists(dto.ma_nguoi_binh_luan);
+
     return this.prisma.binh_luan.create({
       data: {
         ma_phong: dto.ma_phong,
@@ -98,6 +101,17 @@ export class CommentsService {
 
     if (!phong) {
       throw new NotFoundException('Không tìm thấy phòng');
+    }
+  }
+
+  private async checkUserExists(ma_nguoi_binh_luan: number) {
+    const user = await this.prisma.nguoi_dung.findUnique({
+      where: { id: ma_nguoi_binh_luan },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy người dùng');
     }
   }
 }

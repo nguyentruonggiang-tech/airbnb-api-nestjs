@@ -1,5 +1,5 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 
 @ApiSchema({ name: 'TaoBinhLuan' })
 export class CreateCommentDto {
@@ -20,8 +20,10 @@ export class CreateCommentDto {
   @IsString({ message: 'Nội dung phải là chuỗi' })
   noi_dung: string;
 
-  @ApiProperty({ example: 5, description: 'Số sao bình luận' })
+  @ApiProperty({ example: 5, description: 'Số sao bình luận (1-5)' })
   @IsNotEmpty({ message: 'Số sao không được để trống' })
   @IsInt({ message: 'Số sao phải là số nguyên' })
+  @Min(1, { message: 'Số sao phải từ 1 đến 5' })
+  @Max(5, { message: 'Số sao phải từ 1 đến 5' })
   sao_binh_luan: number;
 }
