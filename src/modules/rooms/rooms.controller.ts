@@ -56,6 +56,17 @@ export class RoomsController {
     return this.roomsService.getRooms(query);
   }
 
+  @Get('lay-phong-theo-vi-tri/:maViTri')
+  @Public()
+  @ApiOperation({ summary: 'Lấy danh sách phòng theo vị trí' })
+  @ApiParam({ name: 'maViTri', type: Number, example: 1, description: 'Mã vị trí' })
+  @ApiOkResponse({ description: 'Lấy danh sách phòng theo vị trí thành công' })
+  @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
+  @SuccessMessage('Lấy danh sách phòng theo vị trí thành công')
+  getRoomsByLocation(@Param('maViTri', ParseIntPipe) maViTri: number) {
+    return this.roomsService.getRoomsByLocation(maViTri);
+  }
+
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Lấy thông tin phòng theo id' })
