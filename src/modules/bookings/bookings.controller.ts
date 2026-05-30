@@ -39,6 +39,15 @@ export class BookingsController {
     return this.bookingsService.getBookings();
   }
 
+  @Get('cua-toi')
+  @ApiOperation({ summary: 'Lấy danh sách đặt phòng của tôi' })
+  @ApiOkResponse({ description: 'Lấy danh sách đặt phòng của tôi thành công' })
+  @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
+  @SuccessMessage('Lấy danh sách đặt phòng của tôi thành công')
+  getMyBookings(@User() user: nguoi_dung) {
+    return this.bookingsService.getBookingsByUser(user.id);
+  }
+
   @Get('lay-theo-nguoi-dung/:maNguoiDung')
   @Public()
   @ApiOperation({ summary: 'Lấy danh sách đặt phòng theo người dùng' })
