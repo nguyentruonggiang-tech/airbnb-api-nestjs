@@ -22,7 +22,7 @@ export class BookingsService {
   }
 
   async getBookingsByUser(maNguoiDung: number) {
-    await this.checkUserExists(maNguoiDung);
+    await this.prisma.checkUserExists(maNguoiDung);
 
     const items = await this.prisma.dat_phong.findMany({
       where: { ma_nguoi_dat: maNguoiDung },
@@ -156,33 +156,11 @@ export class BookingsService {
     ngay_den: string | Date,
     ngay_di: string | Date,
   ) {
-    await this.checkPhong(ma_phong);
-    await this.checkUserExists(ma_nguoi_dat);
+    await this.prisma.checkPhongExists(ma_phong);
+    await this.prisma.checkUserExists(ma_nguoi_dat);
 
     if (new Date(ngay_di) <= new Date(ngay_den)) {
       throw new BadRequestException('Ngày đi phải sau ngày đến');
-    }
-  }
-
-  private async checkPhong(ma_phong: number) {
-    const phong = await this.prisma.phong.findUnique({
-      where: { id: ma_phong },
-      select: { id: true },
-    });
-
-    if (!phong) {
-      throw new NotFoundException('Không tìm thấy phòng');
-    }
-  }
-
-  private async checkUserExists(ma_nguoi_dat: number) {
-    const user = await this.prisma.nguoi_dung.findUnique({
-      where: { id: ma_nguoi_dat },
-      select: { id: true },
-    });
-
-    if (!user) {
-      throw new NotFoundException('Không tìm thấy người dùng');
     }
   }
 

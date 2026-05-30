@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { DATABASE_URL } from '../../common/constant/app.constant';
 import { PrismaClient } from './generated/prisma/client';
@@ -18,6 +18,24 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         });
 
         super({ adapter });
+    }
+
+    async checkPhongExists(maPhong: number): Promise<void> {
+        const phong = await this.phong.findUnique({
+            where: { id: maPhong },
+            select: { id: true },
+        });
+
+        if (!phong) throw new NotFoundException('Không tìm thấy phòng');
+    }
+
+    async checkUserExists(maNguoiDung: number): Promise<void> {
+        const user = await this.nguoi_dung.findUnique({
+            where: { id: maNguoiDung },
+            select: { id: true },
+        });
+
+        if (!user) throw new NotFoundException('Không tìm thấy người dùng');
     }
 
     isForeignKeyConstraintError(error: unknown): boolean {

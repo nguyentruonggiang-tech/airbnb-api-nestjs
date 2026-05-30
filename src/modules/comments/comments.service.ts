@@ -57,8 +57,8 @@ export class CommentsService {
       dto.ma_nguoi_binh_luan,
     );
 
-    await this.checkPhong(dto.ma_phong);
-    await this.checkUserExists(maNguoiBinhLuan);
+    await this.prisma.checkPhongExists(dto.ma_phong);
+    await this.prisma.checkUserExists(maNguoiBinhLuan);
 
     return this.prisma.binh_luan.create({
       data: {
@@ -99,7 +99,7 @@ export class CommentsService {
   }
 
   async getCommentsByRoom(maPhong: number) {
-    await this.checkPhong(maPhong);
+    await this.prisma.checkPhongExists(maPhong);
 
     return this.prisma.binh_luan.findMany({
       where: { ma_phong: maPhong },
@@ -129,25 +129,4 @@ export class CommentsService {
     throw new ForbiddenException('Bạn không có quyền thao tác bình luận này');
   }
 
-  private async checkPhong(ma_phong: number) {
-    const phong = await this.prisma.phong.findUnique({
-      where: { id: ma_phong },
-      select: { id: true },
-    });
-
-    if (!phong) {
-      throw new NotFoundException('Không tìm thấy phòng');
-    }
-  }
-
-  private async checkUserExists(ma_nguoi_binh_luan: number) {
-    const user = await this.prisma.nguoi_dung.findUnique({
-      where: { id: ma_nguoi_binh_luan },
-      select: { id: true },
-    });
-
-    if (!user) {
-      throw new NotFoundException('Không tìm thấy người dùng');
-    }
-  }
 }
