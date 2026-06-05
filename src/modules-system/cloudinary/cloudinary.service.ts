@@ -16,6 +16,12 @@ export type UploadImageResult = {
 
 @Injectable()
 export class CloudinaryService {
+    constructor() {
+        if (CLOUDINARY_URL) {
+            cloudinary.config({ cloudinary_url: CLOUDINARY_URL, secure: true });
+        }
+    }
+
     getImageUrl(publicId: string | null): string | null {
         if (!publicId) {
             return null;
@@ -28,11 +34,6 @@ export class CloudinaryService {
         if (!CLOUDINARY_URL) {
             return publicId;
         }
-
-        cloudinary.config({
-            cloudinary_url: CLOUDINARY_URL,
-            secure: true,
-        });
 
         return cloudinary.url(publicId, { secure: true });
     }
