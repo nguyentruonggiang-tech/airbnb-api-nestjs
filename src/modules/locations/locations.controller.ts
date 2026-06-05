@@ -48,7 +48,6 @@ export class LocationsController {
     name: 'keyword',
     required: false,
     type: String,
-    example: 'Hồ Chí Minh',
     description: 'Tìm theo ten_vi_tri, tinh_thanh hoặc quoc_gia',
   })
   @ApiOkResponse({ description: 'Lấy danh sách vị trí thành công' })

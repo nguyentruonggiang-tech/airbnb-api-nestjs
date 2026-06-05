@@ -51,7 +51,6 @@ export class UsersController {
         name: 'keyword',
         required: false,
         type: String,
-        example: 'Nguyen',
         description: 'Tìm theo name, email hoặc phone',
     })
     @ApiOkResponse({ description: 'Danh sách người dùng phân trang (không có pass_word)' })
@@ -67,7 +66,6 @@ export class UsersController {
         name: 'keyword',
         required: true,
         type: String,
-        example: 'nguyen',
     })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
     @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
