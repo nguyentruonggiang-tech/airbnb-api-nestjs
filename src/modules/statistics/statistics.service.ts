@@ -136,19 +136,19 @@ export class StatisticsService {
     });
 
     const roomToLocation = new Map(rooms.map((room) => [room.id, room.ma_vi_tri]));
-    const locationBookingCount = new Map<number, number>();
+    const soLuotDatMap = new Map<number, number>();
 
     for (const row of groupedByRoom) {
       const maViTri = roomToLocation.get(row.ma_phong);
       if (maViTri === undefined) continue;
 
-      locationBookingCount.set(
+      soLuotDatMap.set(
         maViTri,
-        (locationBookingCount.get(maViTri) ?? 0) + row._count.id,
+        (soLuotDatMap.get(maViTri) ?? 0) + row._count.id,
       );
     }
 
-    const topLocations = [...locationBookingCount.entries()]
+    const topLocations = [...soLuotDatMap.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, limit);
 
@@ -170,6 +170,28 @@ export class StatisticsService {
         soLuotDat,
       };
     });
+  }
+
+  async getDoanhThuTheoThang(nam: number) {
+    const rows = await this.prisma.$queryRaw<Array<{ thang: number; doanhThu: string }>>`
+      SELECT
+        MONTH(dp.ngay_di) AS thang,
+        SUM(DATEDIFF(dp.ngay_di, dp.ngay_den) * p.gia_tien) AS doanhThu
+      FROM dat_phong dp
+      JOIN phong p ON p.id = dp.ma_phong
+      WHERE YEAR(dp.ngay_di) = ${nam}
+      GROUP BY MONTH(dp.ngay_di)
+      ORDER BY thang
+    `;
+
+    const doanhThuMap = new Map(rows.map((r) => [Number(r.thang), Number(r.doanhThu)]));
+
+    const theoThang = Array.from({ length: 12 }, (_, i) => ({
+      thang: i + 1,
+      doanhThu: doanhThuMap.get(i + 1) ?? 0,
+    }));
+
+    return { nam, theoThang };
   }
 
   private async getDatPhongGanDay(limit: number) {
