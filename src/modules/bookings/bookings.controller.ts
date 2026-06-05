@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
@@ -15,6 +16,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -24,6 +26,7 @@ import { User } from 'src/common/decorators/user.decorator';
 import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { GetBookingsQueryDto } from './dto/get-bookings-query.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @ApiTags('DatPhong')
@@ -33,36 +36,40 @@ export class BookingsController {
 
   @Get()
   @Public()
-  @ApiOperation({ summary: 'Lấy danh sách đặt phòng' })
+  @ApiOperation({ summary: 'Lấy danh sách đặt phòng (phân trang)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiOkResponse({ description: 'Lấy danh sách đặt phòng thành công' })
   @SuccessMessage('Lấy danh sách đặt phòng thành công')
-  getBookings() {
-    return this.bookingsService.getBookings();
+  getBookings(@Query() query: GetBookingsQueryDto) {
+    return this.bookingsService.getBookings(query);
   }
 
   @Get('cua-toi')
-  @ApiOperation({ summary: 'Lấy danh sách đặt phòng của tôi' })
+  @ApiOperation({ summary: 'Lấy danh sách đặt phòng của tôi (phân trang)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiOkResponse({ description: 'Lấy danh sách đặt phòng của tôi thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
   @SuccessMessage('Lấy danh sách đặt phòng của tôi thành công')
-  getMyBookings(@User() user: nguoi_dung) {
-    return this.bookingsService.getBookingsByUser(user.id);
+  getMyBookings(@User() user: nguoi_dung, @Query() query: GetBookingsQueryDto) {
+    return this.bookingsService.getBookingsByUser(user.id, query);
   }
 
   @Get('lay-theo-nguoi-dung/:maNguoiDung')
   @Public()
-  @ApiOperation({ summary: 'Lấy danh sách đặt phòng theo người dùng' })
-  @ApiParam({
-    name: 'maNguoiDung',
-    type: Number,
-    example: 1,
-    description: 'Mã người dùng',
-  })
+  @ApiOperation({ summary: 'Lấy danh sách đặt phòng theo người dùng (phân trang)' })
+  @ApiParam({ name: 'maNguoiDung', type: Number, example: 1, description: 'Mã người dùng' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiOkResponse({ description: 'Lấy danh sách đặt phòng theo người dùng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy người dùng' })
   @SuccessMessage('Lấy danh sách đặt phòng theo người dùng thành công')
-  getBookingsByUser(@Param('maNguoiDung', ParseIntPipe) maNguoiDung: number) {
-    return this.bookingsService.getBookingsByUser(maNguoiDung);
+  getBookingsByUser(
+    @Param('maNguoiDung', ParseIntPipe) maNguoiDung: number,
+    @Query() query: GetBookingsQueryDto,
+  ) {
+    return this.bookingsService.getBookingsByUser(maNguoiDung, query);
   }
 
   @Get(':id')
@@ -77,7 +84,6 @@ export class BookingsController {
   }
 
   @Post()
-
   @ApiOperation({ summary: 'Tạo đặt phòng mới' })
   @ApiOkResponse({ description: 'Tạo đặt phòng thành công' })
   @ApiUnauthorizedResponse({ description: 'Chưa đăng nhập hoặc token không hợp lệ' })
@@ -92,7 +98,6 @@ export class BookingsController {
   }
 
   @Put(':id')
-
   @ApiOperation({ summary: 'Cập nhật đặt phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID đặt phòng' })
   @ApiOkResponse({ description: 'Cập nhật đặt phòng thành công' })
@@ -110,7 +115,6 @@ export class BookingsController {
   }
 
   @Delete(':id')
-
   @ApiOperation({ summary: 'Xóa đặt phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID đặt phòng' })
   @ApiOkResponse({ description: 'Xóa đặt phòng thành công' })

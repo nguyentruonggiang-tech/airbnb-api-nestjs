@@ -35,7 +35,9 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variable files
+# Environment
+.env
+.env.local
 .env.development.local
 .env.test.local
 .env.production.local
@@ -52,4 +54,11 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Local tooling
 config.bat
+.cursor/
+
+# Local planning notes (optional copy at repo root)
+airbnb_api_nestjs_10_day_plan_and_cursor_prompts.md
+docs/
