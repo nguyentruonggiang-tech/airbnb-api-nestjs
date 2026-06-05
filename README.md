@@ -16,11 +16,11 @@ NestJS 11 · MySQL · Prisma 7 · JWT (HTTP cookies) · Swagger · Cloudinary ·
 |------|----------------------|
 | Auth | Sign up, sign in, refresh token, **sign out**, get current user |
 | Users | CRUD, search, avatar upload, **update own profile** (no `role` change) |
-| Rooms | CRUD, search, upload image, **rooms by location**, **check availability by dates** |
+| Rooms | CRUD, search, upload image, **rooms by location**, **check availability by dates**, **rating stats** (`thongKeBinhLuan`) on list/detail/by-location |
 | Bookings | CRUD, **my bookings (JWT)**, **block overlapping dates** on create/update |
 | Comments | CRUD, pagination, comments by room, star rating 1–5 |
 
-**Not in this release:** advanced room search, comment rating stats, admin dashboard stats.
+**Not in this release:** advanced room search, admin dashboard stats.
 
 ## Quick start
 

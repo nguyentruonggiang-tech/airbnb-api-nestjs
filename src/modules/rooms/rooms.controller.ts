@@ -96,7 +96,6 @@ export class RoomsController {
   }
 
   @Post()
-
   @ApiOperation({ summary: 'Tạo phòng mới' })
   @ApiOkResponse({ description: 'Tạo phòng thành công' })
   @ApiNotFoundResponse({ description: 'Không tìm thấy vị trí' })
@@ -110,7 +109,6 @@ export class RoomsController {
   }
 
   @Post('upload-hinh-phong/:id')
-
   @UseInterceptors(FileInterceptor('hinhAnh'))
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
@@ -141,7 +139,6 @@ export class RoomsController {
   }
 
   @Put(':id')
-
   @ApiOperation({ summary: 'Cập nhật phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
   @ApiOkResponse({ description: 'Cập nhật phòng thành công' })
@@ -159,7 +156,6 @@ export class RoomsController {
   }
 
   @Delete(':id')
-
   @ApiOperation({ summary: 'Xóa phòng' })
   @ApiParam({ name: 'id', type: Number, example: 1, description: 'ID phòng' })
   @ApiOkResponse({ description: 'Xóa phòng thành công' })
