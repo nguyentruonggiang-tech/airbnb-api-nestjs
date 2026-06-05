@@ -15,6 +15,10 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomsService {
+  private readonly includeLocation = {
+    vi_tri: { select: { id: true, ten_vi_tri: true, tinh_thanh: true, quoc_gia: true, hinh_anh: true } },
+  } as const;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly cloudinaryService: CloudinaryService,
@@ -29,7 +33,7 @@ export class RoomsService {
       : {};
 
     const [items, totalItem] = await Promise.all([
-      this.prisma.phong.findMany({ where, skip, take: pageSize, orderBy: { id: 'desc' } }),
+      this.prisma.phong.findMany({ where, include: this.includeLocation, skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.phong.count({ where }),
     ]);
 
@@ -49,35 +53,28 @@ export class RoomsService {
       throw new BadRequestException('Ngày đi phải sau ngày đến');
     }
 
-    const dat_phong_trung = await this.prisma.dat_phong.findMany({
+    const conflicts = await this.prisma.dat_phong.findMany({
       where: {
         ma_phong: id,
         ngay_den: { lt: ngayDi },
         ngay_di: { gt: ngayDen },
       },
-      select: {
-        id: true,
-        ngay_den: true,
-        ngay_di: true,
-        so_luong_khach: true,
-      },
+      select: { id: true, ngay_den: true, ngay_di: true, so_luong_khach: true },
     });
 
-    const con_trong = dat_phong_trung.length === 0;
+    const con_trong = conflicts.length === 0;
 
     return {
       con_trong,
       ngay_den: dto.ngay_den,
       ngay_di: dto.ngay_di,
-      ...(con_trong
-        ? {}
-        : {
-            dat_phong_trung: dat_phong_trung.map((b) => ({
-              ...b,
-              ngay_den: b.ngay_den.toISOString().slice(0, 10),
-              ngay_di: b.ngay_di.toISOString().slice(0, 10),
-            })),
-          }),
+      ...(con_trong ? {} : {
+        dat_phong_trung: conflicts.map((b) => ({
+          ...b,
+          ngay_den: b.ngay_den.toISOString().slice(0, 10),
+          ngay_di: b.ngay_di.toISOString().slice(0, 10),
+        })),
+      }),
     };
   }
 
@@ -86,6 +83,7 @@ export class RoomsService {
 
     const items = await this.prisma.phong.findMany({
       where: { ma_vi_tri: maViTri },
+      include: this.includeLocation,
       orderBy: { id: 'desc' },
     });
 
@@ -95,6 +93,7 @@ export class RoomsService {
   async getRoomById(id: number) {
     const room = await this.prisma.phong.findUnique({
       where: { id },
+      include: this.includeLocation,
     });
 
     if (!room) {
@@ -128,6 +127,7 @@ export class RoomsService {
         hinh_anh: dto.hinh_anh,
         ma_vi_tri: dto.ma_vi_tri,
       },
+      include: this.includeLocation,
     });
 
     return this.formatRoom(createdRoom);
@@ -142,32 +142,27 @@ export class RoomsService {
 
     const updatedRoom = await this.prisma.phong.update({
       where: { id },
-      data: {
-        ...dto,
-      },
+      data: { ...dto },
+      include: this.includeLocation,
     });
 
     return this.formatRoom(updatedRoom);
   }
 
   async deleteRoom(id: number) {
-    const room = await this.getRoomById(id);
+    await this.getRoomById(id);
 
     try {
-      await this.prisma.phong.delete({
-        where: { id },
-      });
+      const deleted = await this.prisma.phong.delete({ where: { id } });
+      return this.formatRoom(deleted);
     } catch (error) {
       if (this.prisma.isForeignKeyConstraintError(error)) {
         throw new ConflictException(
           'Không thể xóa phòng vì đang có dữ liệu đặt phòng hoặc bình luận liên quan',
         );
       }
-
       throw error;
     }
-
-    return this.formatRoom(room);
   }
 
   async uploadRoomImage(id: number, file?: Express.Multer.File) {
@@ -180,6 +175,7 @@ export class RoomsService {
     const updatedRoom = await this.prisma.phong.update({
       where: { id },
       data: { hinh_anh: publicId },
+      include: this.includeLocation,
     });
 
     return this.formatRoom(updatedRoom);
@@ -196,10 +192,16 @@ export class RoomsService {
     }
   }
 
-  private formatRoom<T extends { hinh_anh: string | null }>(room: T): T {
+  private formatRoom<T extends { hinh_anh: string | null; vi_tri?: { hinh_anh: string | null } | null }>(room: T): T {
     return {
       ...room,
       hinh_anh: this.cloudinaryService.getImageUrl(room.hinh_anh),
+      ...(room.vi_tri && {
+        vi_tri: {
+          ...room.vi_tri,
+          hinh_anh: this.cloudinaryService.getImageUrl(room.vi_tri.hinh_anh),
+        },
+      }),
     };
   }
 }
