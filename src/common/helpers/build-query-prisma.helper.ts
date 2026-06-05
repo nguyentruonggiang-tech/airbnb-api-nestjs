@@ -30,9 +30,9 @@ export const buildQueryPrisma = (
         keyword: keywordOption,
     } = options;
 
-    const { page, pageIndex, pageSize, keyword } = req.query;
+    const { page, pageSize, keyword } = req.query;
 
-    let pageNumber = Number(page ?? pageIndex);
+    let pageNumber = Number(page);
     let pageSizeNumber = Number(pageSize);
 
     pageNumber = Number.isFinite(pageNumber) && pageNumber > 0 ? pageNumber : pageDefault;

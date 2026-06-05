@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
+import { buildPage, parsePagination } from 'src/common/helpers/pagination.helper';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { GetBookingsQueryDto } from './dto/get-bookings-query.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -18,20 +19,20 @@ export class BookingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getBookings(query: GetBookingsQueryDto) {
-    const { page, pageSize, skip } = this.parsePagination(query);
+    const { page, pageSize, skip } = parsePagination(query);
 
     const [items, totalItem] = await Promise.all([
       this.prisma.dat_phong.findMany({ skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.dat_phong.count(),
     ]);
 
-    return this.buildPage(items, { page, pageSize, totalItem });
+    return buildPage(items.map((item) => this.formatBooking(item)), { page, pageSize, totalItem });
   }
 
   async getBookingsByUser(maNguoiDung: number, query: GetBookingsQueryDto) {
     await this.prisma.checkUserExists(maNguoiDung);
 
-    const { page, pageSize, skip } = this.parsePagination(query);
+    const { page, pageSize, skip } = parsePagination(query);
     const where = { ma_nguoi_dat: maNguoiDung };
 
     const [items, totalItem] = await Promise.all([
@@ -39,7 +40,7 @@ export class BookingsService {
       this.prisma.dat_phong.count({ where }),
     ]);
 
-    return this.buildPage(items, { page, pageSize, totalItem });
+    return buildPage(items.map((item) => this.formatBooking(item)), { page, pageSize, totalItem });
   }
 
   async getBookingById(id: number) {
@@ -165,22 +166,6 @@ export class BookingsService {
         `Phòng đã được đặt từ ${conflict.ngay_den.toISOString().slice(0, 10)} đến ${conflict.ngay_di.toISOString().slice(0, 10)}`,
       );
     }
-  }
-
-  private parsePagination(query: GetBookingsQueryDto) {
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    return { page, pageSize, skip: (page - 1) * pageSize };
-  }
-
-  private buildPage(items: BookingRecord[], meta: { page: number; pageSize: number; totalItem: number }) {
-    return {
-      page: meta.page,
-      pageSize: meta.pageSize,
-      totalItem: meta.totalItem,
-      totalPage: Math.ceil(meta.totalItem / meta.pageSize),
-      items: items.map((item) => this.formatBooking(item)),
-    };
   }
 
   private formatBooking(booking: BookingRecord) {

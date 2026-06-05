@@ -42,7 +42,7 @@ export class LocationsController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Lấy danh sách vị trí (phân trang, tìm kiếm)' })
-  @ApiQuery({ name: 'pageIndex', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
   @ApiQuery({
     name: 'keyword',

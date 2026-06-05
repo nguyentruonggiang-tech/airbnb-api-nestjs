@@ -7,7 +7,6 @@ import { PrismaClient } from './generated/prisma/client';
 export class PrismaService extends PrismaClient implements OnModuleInit {
     constructor() {
         const url = new URL(DATABASE_URL as string);
-        console.log(url);
         const params = new URLSearchParams(url.search);
         const sslAccept = params.get('sslaccept');
         const adapter = new PrismaMariaDb({

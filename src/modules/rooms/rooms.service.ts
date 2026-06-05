@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { buildPage, parsePagination } from 'src/common/helpers/pagination.helper';
 import { CloudinaryService } from 'src/modules-system/cloudinary/cloudinary.service';
 import { Prisma } from 'src/modules-system/prisma/generated/prisma/client';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
@@ -20,45 +21,21 @@ export class RoomsService {
   ) {}
 
   async getRooms(query: GetRoomsQueryDto) {
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 10;
+    const { page, pageSize, skip } = parsePagination(query);
     const keyword = query.keyword?.trim();
-    const skip = (page - 1) * pageSize;
 
     const where: Prisma.phongWhereInput = keyword
-      ? {
-          OR: [
-            {
-              ten_phong: {
-                contains: keyword,
-              },
-            },
-            {
-              mo_ta: {
-                contains: keyword,
-              },
-            },
-          ],
-        }
+      ? { OR: [{ ten_phong: { contains: keyword } }, { mo_ta: { contains: keyword } }] }
       : {};
 
     const [items, totalItem] = await Promise.all([
-      this.prisma.phong.findMany({
-        where,
-        skip,
-        take: pageSize,
-        orderBy: { id: 'desc' },
-      }),
+      this.prisma.phong.findMany({ where, skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.phong.count({ where }),
     ]);
 
     return {
       keyword: keyword ?? null,
-      page,
-      pageSize,
-      totalItem,
-      totalPage: Math.ceil(totalItem / pageSize),
-      items: items.map((item) => this.formatRoom(item)),
+      ...buildPage(items.map((item) => this.formatRoom(item)), { page, pageSize, totalItem }),
     };
   }
 

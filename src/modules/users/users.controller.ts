@@ -45,7 +45,7 @@ export class UsersController {
     @Get()
     @Public()
     @ApiOperation({ summary: 'Lấy danh sách người dùng (phân trang)' })
-    @ApiQuery({ name: 'pageIndex', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
+    @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
     @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
     @ApiQuery({
         name: 'keyword',
@@ -69,7 +69,7 @@ export class UsersController {
         type: String,
         example: 'nguyen',
     })
-    @ApiQuery({ name: 'pageIndex', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
+    @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Trang hiện tại' })
     @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10, description: 'Số bản ghi mỗi trang' })
     @ApiOkResponse({ description: 'Danh sách người dùng theo từ khóa (không có pass_word)' })
     @SuccessMessage('Tìm kiếm người dùng thành công')

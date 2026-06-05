@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { nguoi_dung } from 'src/modules-system/prisma/generated/prisma/client';
+import { buildPage, parsePagination } from 'src/common/helpers/pagination.helper';
 import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -19,24 +20,14 @@ export class CommentsService {
   }
 
   async getCommentsByPage(page: number, pageSize: number) {
-    const skip = (page - 1) * pageSize;
+    const { skip } = parsePagination({ page, pageSize });
 
     const [items, totalItem] = await Promise.all([
-      this.prisma.binh_luan.findMany({
-        skip,
-        take: pageSize,
-        orderBy: { id: 'desc' },
-      }),
+      this.prisma.binh_luan.findMany({ skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.binh_luan.count(),
     ]);
 
-    return {
-      page,
-      pageSize,
-      totalItem,
-      totalPage: Math.ceil(totalItem / pageSize),
-      items,
-    };
+    return buildPage(items, { page, pageSize, totalItem });
   }
 
   async getCommentById(id: number) {
