@@ -17,13 +17,15 @@ type BookingRecord = {
   ngay_den: Date;
   ngay_di: Date;
   phong?: { hinh_anh: string | null; [key: string]: unknown } | null;
+  nguoi_dung?: { avatar: string | null; [key: string]: unknown } | null;
   [key: string]: unknown;
 };
 
 @Injectable()
 export class BookingsService {
-  private readonly includeRoom = {
+  private readonly includeRelations = {
     phong: { select: { id: true, ten_phong: true, gia_tien: true, hinh_anh: true } },
+    nguoi_dung: { select: { id: true, name: true, avatar: true } },
   } as const;
 
   constructor(
@@ -35,7 +37,7 @@ export class BookingsService {
     const { page, pageSize, skip } = parsePagination(query);
 
     const [items, totalItem] = await Promise.all([
-      this.prisma.dat_phong.findMany({ include: this.includeRoom, skip, take: pageSize, orderBy: { id: 'desc' } }),
+      this.prisma.dat_phong.findMany({ include: this.includeRelations, skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.dat_phong.count(),
     ]);
 
@@ -49,7 +51,7 @@ export class BookingsService {
     const where = { ma_nguoi_dat: maNguoiDung };
 
     const [items, totalItem] = await Promise.all([
-      this.prisma.dat_phong.findMany({ where, include: this.includeRoom, skip, take: pageSize, orderBy: { id: 'desc' } }),
+      this.prisma.dat_phong.findMany({ where, include: this.includeRelations, skip, take: pageSize, orderBy: { id: 'desc' } }),
       this.prisma.dat_phong.count({ where }),
     ]);
 
@@ -59,7 +61,7 @@ export class BookingsService {
   async getBookingById(id: number) {
     const booking = await this.prisma.dat_phong.findUnique({
       where: { id },
-      include: this.includeRoom,
+      include: this.includeRelations,
     });
 
     if (!booking) {
@@ -82,7 +84,7 @@ export class BookingsService {
         so_luong_khach: dto.so_luong_khach ?? 1,
         ma_nguoi_dat: maNguoiDat,
       },
-      include: this.includeRoom,
+      include: this.includeRelations,
     });
 
     return this.formatBooking(booking);
@@ -118,7 +120,7 @@ export class BookingsService {
         ...(dto.so_luong_khach !== undefined && { so_luong_khach: dto.so_luong_khach }),
         ...(dto.ma_nguoi_dat !== undefined && { ma_nguoi_dat: dto.ma_nguoi_dat }),
       },
-      include: this.includeRoom,
+      include: this.includeRelations,
     });
 
     return this.formatBooking(updated);
@@ -135,7 +137,7 @@ export class BookingsService {
 
     const deleted = await this.prisma.dat_phong.delete({
       where: { id },
-      include: this.includeRoom,
+      include: this.includeRelations,
     });
 
     return this.formatBooking(deleted);
@@ -190,14 +192,21 @@ export class BookingsService {
   }
 
   private formatBooking(booking: BookingRecord) {
+    const { nguoi_dung, ...rest } = booking;
     return {
-      ...booking,
+      ...rest,
       ngay_den: booking.ngay_den.toISOString().slice(0, 10),
       ngay_di: booking.ngay_di.toISOString().slice(0, 10),
       ...(booking.phong && {
         phong: {
           ...booking.phong,
           hinh_anh: this.cloudinaryService.getImageUrl(booking.phong.hinh_anh),
+        },
+      }),
+      ...(nguoi_dung && {
+        nguoi_dat: {
+          ...nguoi_dung,
+          avatar: this.cloudinaryService.getImageUrl(nguoi_dung.avatar),
         },
       }),
     };
