@@ -19,8 +19,9 @@ NestJS 11 · MySQL · Prisma 7 · JWT (HTTP cookies) · Swagger · Cloudinary ·
 | Rooms | CRUD, search, upload image, **rooms by location**, **check availability by dates**, **rating stats** (`thongKeBinhLuan`) on list/detail/by-location |
 | Bookings | CRUD, **my bookings (JWT)**, **block overlapping dates** on create/update |
 | Comments | CRUD, pagination, comments by room, star rating 1–5 |
+| Statistics | **Admin dashboard** `GET /thong-ke/tong-quan` (counts, revenue, top rooms/locations, recent bookings) |
 
-**Not in this release:** advanced room search, admin dashboard stats.
+**Not in this release:** advanced room search.
 
 ## Quick start
 
@@ -111,6 +112,7 @@ User responses never include `pass_word`.
 | `/api/phong-thue` | Rooms CRUD, **lay-phong-theo-vi-tri/:maViTri**, **:id/kiem-tra-trong**, upload image |
 | `/api/dat-phong` | Bookings CRUD, **GET cua-toi**, overlap validation (409) |
 | `/api/binh-luan` | Comments CRUD, pagination, by room |
+| `/api/thong-ke` | **GET tong-quan** — Admin dashboard (ADMIN only) |
 
 Full request/response details: **Swagger** at `/api-docs`.
 
@@ -136,7 +138,7 @@ feature/* ← branch from develop → PR → develop → main
 ```
 src/
 ├── common/           guards, filters, interceptors, helpers
-├── modules/          auth, users, locations, rooms, bookings, comments
+├── modules/          auth, users, locations, rooms, bookings, comments, statistics
 └── modules-system/   prisma, token, cloudinary
 database/             init.sql, seed.sql
 prisma/               schema (db pull)
