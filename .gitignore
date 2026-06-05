@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# package manager lock files
+package-lock.json
+
 # Logs
 logs
 *.log
@@ -58,7 +61,3 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Local tooling
 config.bat
 .cursor/
-
-# Local planning notes (optional copy at repo root)
-airbnb_api_nestjs_10_day_plan_and_cursor_prompts.md
-docs/
